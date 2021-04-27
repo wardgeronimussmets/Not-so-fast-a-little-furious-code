@@ -98,7 +98,7 @@ extern unsigned char BDLED2_out = 0;
 extern unsigned char LEDGr_out = 0;
 extern unsigned char LEDRed_out = 0;
 //end loop switches
-extern unsigned char ENDLOOP_StartS = 0;
+
 extern unsigned char ENDLOOP_FinishS = 0;
 extern unsigned char ENDLOOP_StartS1 = 0;
 extern unsigned char ENDLOOP_StartS2 = 0;
