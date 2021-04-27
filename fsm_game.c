@@ -22,8 +22,12 @@
 #define TRUE 1
 #define FALSE 0
 
+#define DCout 1
+
 #define RedLDWait 3000
 #define GreenLDWait 5000
+#define BURSTWaitTime 2000
+#define GameEndWaitTime 5000
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 static unsigned char greenLDWasOn = TRUE;
@@ -33,9 +37,16 @@ static unsigned char newGear1 = 0;
 static unsigned char newGear2 = 0;
 
 static unsigned int counter = 0;
+static unsigned int counter1 = 0;
+static unsigned int counter2 = 0;
 
-static enum {FSM_IDLE,FSM_INITIALISE,FSM_GO,FSM_FORWARD,FSM_CARS,BREAK,FSM_CARS_BURST,FSM_BACKWARDS,FSM_GAMEOVER
-            } current_state;
+static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
+
+static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_CARS,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER,FSM_1_BREAKDOWN
+             } current_state_car1;
+
+static enum{FSM_2_IDLE,FSM_2_FORWARD,FSM_2_CARS,FSM_2_BURST,FSM_2_BACKWARDS,FSM_2_GAMEOVER,FSM_2_BREAKDOWN
+            } current_state_car2;
             
 /********************************************************************
  * Function:        void fsm_game_init(void)
@@ -46,7 +57,7 @@ static enum {FSM_IDLE,FSM_INITIALISE,FSM_GO,FSM_FORWARD,FSM_CARS,BREAK,FSM_CARS_
  *                  may initialize some counters          
  ********************************************************************/
 void fsm_game_init(void) {
-	current_state = FSM_IDLE;
+	//current_state_game = FSM_IDLE;
   
     counter = 0;
     DC2Fw_out = LOW;
@@ -69,51 +80,29 @@ void fsm_game_init(void) {
  ********************************************************************/
 void fsm_game(void) {
     
-    switch (current_state) {                
-        case FSM_IDLE:
-            /*DC1Fw_out = LOW;
-            DC2Fw_out = LOW;
-            DC1Bw_out = LOW;
-            DC2Bw_out = LOW;
-            BDLED1_out = LOW;
-            BDLED2_out = LOW;
-            CONTR_VU1 = LOW;
-            CONTR_VU2 = LOW;
-            LEDGr_out = LOW;
-            LEDRed_out = LOW;*/
-            
+    switch (current_state_game) {                
+        case FSM_GAME_IDLE:          
             if(CONT1_CLUTCH == PUSHED && CONT2_CLUTCH == PUSHED)
             {
-                current_state = FSM_INITIALISE;
+                current_state_game = FSM_GAME_INITIALISE;
                 counter = 0;
             }
-        case FSM_INITIALISE:
-            /*DC1Fw_out = LOW;
-            DC2Fw_out = LOW;
-            DC1Bw_out = LOW;
-            DC2Bw_out = LOW;
-            BDLED1_out = LOW;
-            BDLED2_out = LOW;
-            CONTR_VU1 = LOW;
-            CONTR_VU2 = LOW;
-            LEDGr_out = LOW;*/
+            break;
+        case FSM_GAME_INITIALISE:
             LEDRed_out = HIGH;
             
             counter ++;
             if(counter > RedLDWait)
             {
-                current_state = FSM_GO;
+                current_state_game = FSM_GAME_GO;
                 counter = 0;
             }
-            
-        case FSM_GO:
+            break;
+        case FSM_GAME_GO:
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
-            current_state = FSM_FORWARD;
-            
-       case FSM_FORWARD:
-           //check if green led needs to be on
+            //check if green led needs to be on
            if(!greenLDWasOn)
            {
                counter ++;
@@ -121,22 +110,116 @@ void fsm_game(void) {
                {
                    greenLDWasOn = TRUE;
                    LEDGr_out = LOW;
+                   current_state_game = FSM_GAME_WAIT;
                }
-           }   
+           }  
+            break;
+        case FSM_GAME_WAIT:
+            break;
+        default:
+            current_state_game = FSM_GAME_IDLE;
+            break;
+    }
+    /*********************************************************************************************************************/
+    switch(current_state_car1)
+    {
+        case FSM_1_IDLE:
+            DC1Bw_out = LOW;
+            DC1Fw_out = LOW;
+            if(GAME_STARTED && (CONT1_GEAR1 == PUSHED)) 
+            {
+                current_state_car1 = FSM_1_FORWARD;
+                gear1 = 1;
+            }
+            break;
+        case FSM_1_FORWARD:
+            
+           DC1Fw_out = 0.5*DCout;  
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
-               current_state = FSM_GAMEOVER;
+               current_state_car1 = FSM_1_GAMEOVER;
+           
+           
+            //check if car has shifted a gear          
+            newGear1 = 0;
+            if(CONT1_GEAR1 ==  PUSHED) newGear1 =  1;
+            if(CONT1_GEAR2 ==  PUSHED) newGear1 =  2;
+            if(CONT1_GEAR3 ==  PUSHED) newGear1 =  3;
+            if(CONT1_GEAR4 ==  PUSHED) newGear1 =  4;
+            if(CONT1_GEAR5 ==  PUSHED) newGear1 =  5;
+            if(CONT1_GEAR6 ==  PUSHED) newGear1 =  6;
+            
+        if(newGear1 == gear1)
+        {
+            //no gear change
+            
+        }
+        else
+        {
+            //gear1 has been changed
+            if(newGear1 - gear1 == 1 && CONT1_CLUTCH == PUSHED)
+            {
+                //correct shift
+                counter1 = 0;
+                current_state_car1 = FSM_1_BURST;
+                gear1 = newGear1;
+            }
+            else
+            {
+                //breakdown
+                current_state_car1 = FSM_1_BREAKDOWN;
+            }
+        }
+        
+            
+    
+        break;
+        case FSM_1_BURST:
+            DC1Fw_out = DCout;
+            counter1 ++;
+            if(counter1>BURSTWaitTime)
+            {
+                current_state_car1 = FSM_1_FORWARD;
+            }
+            
+            break;
+        case FSM_1_BREAKDOWN:
+            DC1Fw_out = LOW;
+            CAR1_BREAKDOWN = TRUE;
+            break;
+        case FSM_1_GAMEOVER:
+            //a car has finished
+            counter1 ++;
+            if(counter1>GameEndWaitTime)
+            {
+                current_state_car1 = FSM_1_BACKWARDS;
+            }
+            break;
+        case FSM_1_BACKWARDS:
+            DC1Fw_out = LOW;
+            DC1Bw_out = DCout;
+            if(ENDLOOP_StartS1 == TRUE)
+            {
+                current_state_car1 = FSM_1_IDLE;
+            }
+            break;
+        default:
+            current_state_car1 = FSM_1_IDLE;
+            break;
+    }
+    /*******************************************************************************************************************************************/
+    
+      switch(current_state_car2)
+    {
+        case FSM_2_FORWARD:
+            
+           //check if a car has finished
+           if(ENDLOOP_FinishS == PUSHED)
+               current_state_game = FSM_2_GAMEOVER;
            
            
            //check if car has shifted a gear          
-        newGear1 = 0;
-        if(CONT1_GEAR1 == PUSHED)  newGear1 =  1;
-        if(CONT1_GEAR2 ==  PUSHED) newGear1 =  2;
-        if(CONT1_GEAR3 ==  PUSHED) newGear1 =  3;
-        if(CONT1_GEAR4 ==  PUSHED) newGear1 =  4;
-        if(CONT1_GEAR5 ==  PUSHED) newGear1 =  5;
-        if(CONT1_GEAR6 ==  PUSHED) newGear1 =  6;
-    
+        
         newGear2 = 0;
         if(CONT2_GEAR1 ==  PUSHED) newGear2 =  1;
         if(CONT2_GEAR2 ==  PUSHED) newGear2 =  2;
@@ -153,13 +236,25 @@ void fsm_game(void) {
         else
         {
             //gear1 has been changed
+            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED)
+            {
+                //correct shift
+                current_state_game = FSM_2_BURST;
+                gear2 = newGear2;
+            }
+            else
+            {
+                //breakdown
+                CAR2_BREAKDOWN = TRUE;
+            }
         }
-    
-           
+        
+        
+        break;
         default:
-            current_state = FSM_IDLE;
+            current_state_car2 = FSM_2_IDLE;
             break;
-    }
+    } 
     
     
     

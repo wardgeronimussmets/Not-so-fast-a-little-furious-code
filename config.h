@@ -103,6 +103,11 @@ extern unsigned char ENDLOOP_FinishS = 0;
 extern unsigned char ENDLOOP_StartS1 = 0;
 extern unsigned char ENDLOOP_StartS2 = 0;
 
+//booleans
+extern unsigned char CAR1_BREAKDOWN = 0;
+extern unsigned char CAR2_BREAKDOWN = 0;
+extern unsigned char GAME_STARTED = 0;
+
 
 //input controller
 extern unsigned char CONT1_GEAR1 = 0;
