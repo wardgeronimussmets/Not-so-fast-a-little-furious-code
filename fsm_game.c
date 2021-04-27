@@ -125,6 +125,7 @@ void fsm_game(void) {
                 gear1 = 0;
                 gear2 = 0;
                 current_state_game = FSM_GAME_IDLE;
+                void setDirectionDCFW();
             }
             break;
         default:
@@ -136,6 +137,7 @@ void fsm_game(void) {
     {
         current_state_car1 = FSM_1_BACKWARDS;
         current_state_car2 = FSM_1_BACKWARDS;
+        void setDirectionDCBW();
     }
     /*********************************************************************************************************************/
     switch(current_state_car1)

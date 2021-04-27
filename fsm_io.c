@@ -16,10 +16,19 @@
 #define LOW 0
 #define PRESSED 0
 #define RELEASED 1
+#define TRUE 1
+#define FALSE 0
+
+#define dcONTime 200
+#define dcOFFTime 1000
+#define dcForwards 1
+#define dcBackwards 0
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 
 static enum {MULT_A0,MULT_A1,MULT_A2,MULT_A3,MULT_A4,MULT_A5,MULT_A6,MULT_A7,MULT_None}current_mult;
+static int dcCounter1 = 0;
+static int dcCounter2 = 0;
             
 /********************************************************************
  * Function:        void fsm_io_init(void)
@@ -31,9 +40,18 @@ static enum {MULT_A0,MULT_A1,MULT_A2,MULT_A3,MULT_A4,MULT_A5,MULT_A6,MULT_A7,MUL
  ********************************************************************/
 void fsm_io_init(void) {
     current_mult = MULT_A0;
+    DC1_OUT = LOW;
+    DC2_OUT = LOW;
+    DC_DIRECTION = dcForwards;
     
-    
-    
+}
+void setDirectionDCBW(void)
+{
+    DC_DIRECTION = dcBackwards;
+}
+void setDirectionDCFW(void)
+{
+    DC_DIRECTION = dcForwards;
 }
 
 /********************************************************************
@@ -45,8 +63,116 @@ void fsm_io_init(void) {
  *                  and off once you pushed a button.          
  ********************************************************************/
 void fsm_io(void) {
+    //leds
     CONTR_BD1 = BDLED1_out;
     CONTR_BD2 = BDLED2_out;
+    
+    //dc motors
+    dcCounter1 ++;
+    dcCounter2 ++;
+    
+    if(DC_DIRECTION == dcForwards)
+    {
+        //DC motor 1
+        if(DC1Fw_out != LOW)
+        {
+            //pulse wave
+            if(DC1_OUT == HIGH)
+            {
+                if(dcCounter1 > dcONTime*DC1Fw_out)
+                {
+                    dcCounter1 = 0;
+                    DC1_OUT == LOW;
+                
+                }
+            }
+            else
+            {
+               if(dcCounter1 > dcOFFTime*DC1Fw_out)
+                {
+                    dcCounter1 = 0;
+                    DC1_OUT == LOW;
+                
+                } 
+            }
+        }
+        else
+        {
+            DC1_OUT = LOW;
+        }
+        //DC motor 2
+        if(DC2Fw_out != LOW)
+        {
+            //pulse wave
+            if(DC2_OUT == HIGH)
+            {
+                if(dcCounter2 > dcONTime*DC2Fw_out)
+                {
+                    dcCounter2 = 0;
+                    DC2_OUT == LOW;
+                
+                }
+            }
+            else
+            {
+               if(dcCounter2 > dcOFFTime*DC2Fw_out)
+                {
+                    dcCounter2 = 0;
+                    DC2_OUT == LOW;
+                
+                } 
+            }
+        }
+        else
+        {
+            DC2_OUT = LOW;
+        }
+    }
+    else
+    {
+        //dc motor 1
+        if(DC1Bw_out != LOW)
+        {
+            //pulse wave
+            if(DC1_OUT == HIGH)
+            {
+                if(dcCounter1>dcONTime)
+                {
+                    dcCounter1 == 0;
+                    DC1_OUT == LOW;
+                }
+            }
+            else
+            {
+                if(dcCounter1>dcOFFTime)
+                {
+                    dcCounter1 == 0;
+                    DC1_OUT == LOW;
+                }
+            }
+        }
+        //dc motor 2
+        if(DC2Bw_out != LOW)
+        {
+            //pulse wave
+            if(DC2_OUT == HIGH)
+            {
+                if(dcCounter2>dcONTime)
+                {
+                    dcCounter2 == 0;
+                    DC2_OUT == LOW;
+                }
+            }
+            else
+            {
+                if(dcCounter2>dcOFFTime)
+                {
+                    dcCounter2 == 0;
+                    DC2_OUT == LOW;
+                }
+            }
+        }
+    }
     
   
     

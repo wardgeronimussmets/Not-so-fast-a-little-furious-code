@@ -74,9 +74,9 @@
 
 #define MULT_ENABLE     PORTAbits.RA4
 
-#define DC2_OUT         PORTAbits.RA5;
-#define DC1_OUT         PORTCbits.RC2;
-#define DC_DIRECTION    PORTAbits.RA3; //als hoog gaan ze de ene richting uit en als laag de andere
+#define DC2_OUT         PORTAbits.RA5
+#define DC1_OUT         PORTCbits.RC2
+#define DC_DIRECTION    PORTAbits.RA3 //als hoog gaan ze de ene richting uit en als laag de andere
 
 
 /** I N C L U D E S *************************************************/
@@ -108,9 +108,10 @@ extern unsigned char ENDLOOP_StartS1 = 0;
 extern unsigned char ENDLOOP_StartS2 = 0;
 
 //booleans
-extern unsigned char CAR1_BREAKDOWN = 0;
-extern unsigned char CAR2_BREAKDOWN = 0;
-extern unsigned char GAME_STARTED = 0;
+extern unsigned char CAR1_BREAKDOWN = FALSE;
+extern unsigned char CAR2_BREAKDOWN = FALSE;
+extern unsigned char GAME_STARTED = FALSE;
+extern unsigned char CARS_BACKINGUP = FALSE;
 
 
 //input controller
