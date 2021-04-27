@@ -74,6 +74,10 @@
 
 #define MULT_ENABLE     PORTAbits.RA4
 
+#define DC2_OUT         PORTAbits.RA5;
+#define DC1_OUT         PORTCbits.RC2;
+#define DC_DIRECTION    PORTAbits.RA3; //als hoog gaan ze de ene richting uit en als laag de andere
+
 
 /** I N C L U D E S *************************************************/
 #include <xc.h>
