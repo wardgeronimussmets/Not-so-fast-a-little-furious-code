@@ -40,12 +40,16 @@ static unsigned int counter = 0;
 static unsigned int counter1 = 0;
 static unsigned int counter2 = 0;
 
+static unsigned char gameWasWon = FALSE;
+static unsigned char car1HasBD = FALSE;
+static unsigned char car2HasBD = FALSE;
+
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
-static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_CARS,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER,FSM_1_BREAKDOWN
+static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER,FSM_1_BREAKDOWN
              } current_state_car1;
 
-static enum{FSM_2_IDLE,FSM_2_FORWARD,FSM_2_CARS,FSM_2_BURST,FSM_2_BACKWARDS,FSM_2_GAMEOVER,FSM_2_BREAKDOWN
+static enum{FSM_2_IDLE,FSM_2_FORWARD,FSM_2_BURST,FSM_2_BACKWARDS,FSM_2_GAMEOVER,FSM_2_BREAKDOWN
             } current_state_car2;
             
 /********************************************************************
@@ -102,6 +106,7 @@ void fsm_game(void) {
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
+            GAME_STARTED = TRUE;
             //check if green led needs to be on
            if(!greenLDWasOn)
            {
@@ -115,21 +120,39 @@ void fsm_game(void) {
            }  
             break;
         case FSM_GAME_WAIT:
+            if((current_state_car1 == FSM_1_IDLE)&&(current_state_car2 == FSM_2_IDLE))
+            {
+                gear1 = 0;
+                gear2 = 0;
+                current_state_game = FSM_GAME_IDLE;
+            }
             break;
         default:
             current_state_game = FSM_GAME_IDLE;
             break;
     }
+    //check if car has finished or if two cars have broken down
+    if(((car1HasBD == TRUE) && (car2HasBD == TRUE))||(gameWasWon== TRUE))
+    {
+        current_state_car1 = FSM_1_BACKWARDS;
+        current_state_car2 = FSM_1_BACKWARDS;
+    }
     /*********************************************************************************************************************/
     switch(current_state_car1)
     {
+        
         case FSM_1_IDLE:
             DC1Bw_out = LOW;
             DC1Fw_out = LOW;
-            if(GAME_STARTED && (CONT1_GEAR1 == PUSHED)) 
+            if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED)) 
             {
                 current_state_car1 = FSM_1_FORWARD;
                 gear1 = 1;
+            }
+            else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED))
+            {
+                //false start
+                current_state_car1 = FSM_1_BREAKDOWN;
             }
             break;
         case FSM_1_FORWARD:
@@ -186,9 +209,12 @@ void fsm_game(void) {
         case FSM_1_BREAKDOWN:
             DC1Fw_out = LOW;
             CAR1_BREAKDOWN = TRUE;
+            car1HasBD = TRUE;
+            BDLED1_out = HIGH;
             break;
         case FSM_1_GAMEOVER:
             //a car has finished
+            gameWasWon = TRUE;
             counter1 ++;
             if(counter1>GameEndWaitTime)
             {
@@ -214,10 +240,15 @@ void fsm_game(void) {
         case FSM_2_IDLE:
             DC2Bw_out = LOW;
             DC2Fw_out = LOW;
-            if(GAME_STARTED && (CONT2_GEAR1 == PUSHED)) 
+            if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED)) 
             {
                 current_state_car2 = FSM_2_FORWARD;
                 gear2 = 1;
+            }
+            else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED))
+            {
+                //false start
+                current_state_car2 = FSM_2_BREAKDOWN;
             }
             break;
         case FSM_2_FORWARD:
@@ -274,9 +305,12 @@ void fsm_game(void) {
         case FSM_2_BREAKDOWN:
             DC2Fw_out = LOW;
             CAR2_BREAKDOWN = TRUE;
+            car2HasBD = TRUE;
+            BDLED2_out = HIGH;
             break;
         case FSM_2_GAMEOVER:
             //a car has finished
+            gameWasWon = TRUE;
             counter2 ++;
             if(counter2>GameEndWaitTime)
             {
