@@ -211,26 +211,35 @@ void fsm_game(void) {
     
       switch(current_state_car2)
     {
+        case FSM_2_IDLE:
+            DC2Bw_out = LOW;
+            DC2Fw_out = LOW;
+            if(GAME_STARTED && (CONT2_GEAR1 == PUSHED)) 
+            {
+                current_state_car2 = FSM_2_FORWARD;
+                gear2 = 1;
+            }
+            break;
         case FSM_2_FORWARD:
             
+           DC2Fw_out = 0.5*DCout;  
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
-               current_state_game = FSM_2_GAMEOVER;
+               current_state_car2 = FSM_2_GAMEOVER;
            
            
-           //check if car has shifted a gear          
-        
-        newGear2 = 0;
-        if(CONT2_GEAR1 ==  PUSHED) newGear2 =  1;
-        if(CONT2_GEAR2 ==  PUSHED) newGear2 =  2;
-        if(CONT2_GEAR3 ==  PUSHED) newGear2 =  3;
-        if(CONT2_GEAR4 ==  PUSHED) newGear2 =  4;
-        if(CONT2_GEAR5 ==  PUSHED) newGear2 =  5;
-        if(CONT2_GEAR6 ==  PUSHED) newGear2 =  6;
-        
-        if(newGear1 == gear1)
+            //check if car has shifted a gear          
+            newGear2 = 0;
+            if(CONT2_GEAR1 ==  PUSHED) newGear2 =  1;
+            if(CONT2_GEAR2 ==  PUSHED) newGear2 =  2;
+            if(CONT2_GEAR3 ==  PUSHED) newGear2 =  3;
+            if(CONT2_GEAR4 ==  PUSHED) newGear2 =  4;
+            if(CONT2_GEAR5 ==  PUSHED) newGear2 =  5;
+            if(CONT2_GEAR6 ==  PUSHED) newGear2 =  6;
+            
+        if(newGear2 == gear2)
         {
-            //gear1 no gear change
+            //no gear change
             
         }
         else
@@ -239,18 +248,49 @@ void fsm_game(void) {
             if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED)
             {
                 //correct shift
-                current_state_game = FSM_2_BURST;
+                counter2 = 0;
+                current_state_car2 = FSM_2_BURST;
                 gear2 = newGear2;
             }
             else
             {
                 //breakdown
-                CAR2_BREAKDOWN = TRUE;
+                current_state_car2 = FSM_2_BREAKDOWN;
             }
         }
         
-        
+            
+    
         break;
+        case FSM_2_BURST:
+            DC2Fw_out = DCout;
+            counter2 ++;
+            if(counter2>BURSTWaitTime)
+            {
+                current_state_car2 = FSM_2_FORWARD;
+            }
+            
+            break;
+        case FSM_2_BREAKDOWN:
+            DC2Fw_out = LOW;
+            CAR2_BREAKDOWN = TRUE;
+            break;
+        case FSM_2_GAMEOVER:
+            //a car has finished
+            counter2 ++;
+            if(counter2>GameEndWaitTime)
+            {
+                current_state_car2 = FSM_2_BACKWARDS;
+            }
+            break;
+        case FSM_2_BACKWARDS:
+            DC2Fw_out = LOW;
+            DC2Bw_out = DCout;
+            if(ENDLOOP_StartS2 == TRUE)
+            {
+                current_state_car2 = FSM_2_IDLE;
+            }
+            break;
         default:
             current_state_car2 = FSM_2_IDLE;
             break;
