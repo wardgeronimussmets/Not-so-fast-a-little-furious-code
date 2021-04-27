@@ -63,13 +63,19 @@ void setDirectionDCFW(void)
  *                  and off once you pushed a button.          
  ********************************************************************/
 void fsm_io(void) {
-    //leds
+    ///leds
     CONTR_BD1 = BDLED1_out;
     CONTR_BD2 = BDLED2_out;
     
-    //dc motors
+    START_LED_GR = LEDGr_out;
+    START_LED_RED = LEDRed_out;
+    
+    ///dc motors
     dcCounter1 ++;
     dcCounter2 ++;
+    
+    //switches
+    ENDLOOP_StartS2 = END_START_SWITCH2;
     
     if(DC_DIRECTION == dcForwards)
     {
@@ -176,7 +182,7 @@ void fsm_io(void) {
     
   
     
-    //Multiplexing
+    ///Multiplexing
     switch(current_mult){
         
         case MULT_A0://connected to a start end loop switch and the end loop switch

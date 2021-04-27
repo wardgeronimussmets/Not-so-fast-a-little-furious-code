@@ -55,6 +55,7 @@
 // #define SERVO_2_OUT LATBbits.LATB5
 
 /* Define all out- and inputs with readable names */
+//microController
 #define PRG_BUTTON      PORTCbits.RC0
 #define LED1_OUT        LATCbits.LATC1
 #define LED2_OUT        LATCbits.LATC2
@@ -62,22 +63,27 @@
 #define MULT_S0         PORTBbits.RB4
 #define MULT_S1         PORTBbits.RB3
 #define MULT_S2         PORTBbits.RB2
+#define MULT_ENABLE     PORTAbits.RA4
 #define CONTR_OUT1      PORTBbits.RB7
 #define CONTR_OUT2      PORTCbits.RC6
-
+//vu meter
 #define CONTR_VU1       PORTAbits.RA7
 #define CONTR_VU2       PORTBbits.RB5
-
+//breakdown leds
 #define CONTR_BD1       PORTAbits.RA6
 #define CONTR_BD2       PORTBbits.RB6
+//starting leds
+#define START_LED_GR    PORTAbits.RA1
+#define START_LED_RED   PORTAbits.RA2
 
 
-#define MULT_ENABLE     PORTAbits.RA4
-
+//dc motor
 #define DC2_OUT         PORTAbits.RA5
 #define DC1_OUT         PORTCbits.RC2
 #define DC_DIRECTION    PORTAbits.RA3 //als hoog gaan ze de ene richting uit en als laag de andere
 
+//end loop switch
+#define END_START_SWITCH2   PORTCbits.RC1
 
 /** I N C L U D E S *************************************************/
 #include <xc.h>
