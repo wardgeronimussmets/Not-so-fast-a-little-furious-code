@@ -45,6 +45,8 @@ void fsm_io_init(void) {
  *                  and off once you pushed a button.          
  ********************************************************************/
 void fsm_io(void) {
+    CONTR_BD1 = BDLED1_out;
+    CONTR_BD2 = BDLED2_out;
     
   
     
