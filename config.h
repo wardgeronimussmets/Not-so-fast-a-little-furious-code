@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *                 Not so fast a little furious 
+ *                 Not so fast a little furious testward
  *
  *********************************************************************
  * Processor:       PIC18F25K50
@@ -39,7 +39,7 @@
 // #define ENABLE_AUDIO TRUE
 
 /* Specify the pin for your audio output, every digital output can be used */
-#define AUDIO_OUT           LATBbits.LATB3
+#define AUDIO_OUT           LATAbits.LATA0
 
 
 /*** Servo Configuration *****************/

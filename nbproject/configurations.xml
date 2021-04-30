@@ -28,6 +28,7 @@
         <itemPath>func_audio.c</itemPath>
         <itemPath>func_ioexp.c</itemPath>
         <itemPath>func_servo.c</itemPath>
+        <itemPath>func_audio2.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>
     </logicalFolder>

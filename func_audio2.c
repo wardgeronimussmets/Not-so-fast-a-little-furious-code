@@ -13,7 +13,6 @@
 #include "func_audio.h"
 #if ENABLE_AUDIO == TRUE
 
-
 /** P U B L I C   V A R I A B L E S *********************************/
 // in order for the variable to be used in other file, it also has to
 // be declared as 'extern' in the corresponding .h file

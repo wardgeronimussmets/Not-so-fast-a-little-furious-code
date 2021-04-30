@@ -3,3 +3,5 @@
 /nbproject/*.bash
 /build/default/
 /dist/default/
+/build/
+/dist/
