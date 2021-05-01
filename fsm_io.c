@@ -188,7 +188,7 @@ void fsm_io(void) {
         case MULT_A0://connected to a start end loop switch and the end loop switch
         
             ENDLOOP_StartS1 = CONTR_OUT1;
-            ENDLOOP_FinishS = CONTR_OUT1;
+            ENDLOOP_FinishS = CONTR_OUT2;
             
             MULT_S0 = HIGH;
             MULT_S1 = LOW;
