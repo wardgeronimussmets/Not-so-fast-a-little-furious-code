@@ -216,7 +216,9 @@ void fsm_game(void) {
             CAR1_BREAKDOWN = TRUE;
             car1HasBD = TRUE;
             BDLED1_out = HIGH;
+            
             break;
+            
         case FSM_1_GAMEOVER:
             //a car has finished
             gameWasWon = TRUE;
@@ -226,6 +228,7 @@ void fsm_game(void) {
                 current_state_car1 = FSM_1_BACKWARDS;
             }
             break;
+            
         case FSM_1_BACKWARDS:
             DC1Fw_out = LOW;
             DC1Bw_out = DCout;
