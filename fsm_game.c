@@ -5,7 +5,7 @@
  *********************************************************************
  * Processor:       PIC18F25K50
  * Compiler:        XC8 1.35+
- * Author:          Jeroen Van Aken
+ * Author:          Team A7
  * Updated:         03/03/2020
  * 
  ********************************************************************/
@@ -86,6 +86,7 @@ void fsm_game(void) {
     
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
+            AUDIO_stop();
             if(CONT1_CLUTCH == PUSHED && CONT2_CLUTCH == PUSHED)
             {
                 current_state_game = FSM_GAME_INITIALISE;
@@ -93,6 +94,7 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
+            AUDIO_play(D1);
             LEDRed_out = HIGH;
             
             counter ++;
@@ -103,6 +105,7 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_GO:
+            AUDIO_play(D2);
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
