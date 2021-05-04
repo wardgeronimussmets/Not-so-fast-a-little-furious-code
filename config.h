@@ -73,8 +73,8 @@
 #define CONTR_BD1       PORTAbits.RA6
 #define CONTR_BD2       PORTBbits.RB6
 //starting leds
-#define START_LED_GR    PORTAbits.RA1
-#define START_LED_RED   PORTAbits.RA2
+#define START_LED_RED    PORTAbits.RA1
+#define START_LED_GR   PORTAbits.RA2
 
 
 //dc motor
