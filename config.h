@@ -36,7 +36,7 @@
 
 
 /*** Audio Configuration *****************/
-// #define ENABLE_AUDIO TRUE
+ #define ENABLE_AUDIO TRUE
 
 /* Specify the pin for your audio output, every digital output can be used */
 #define AUDIO_OUT           LATAbits.LATA0

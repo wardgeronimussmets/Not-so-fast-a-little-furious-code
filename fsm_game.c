@@ -24,8 +24,8 @@
 
 #define DCout 1
 
-#define RedLDWait 3000
-#define GreenLDWait 5000
+#define RedLDWait 10000  // we want 10 sec for the little show to happen in the beggining
+#define GreenLDWait 5000 
 #define BURSTWaitTime 2000
 #define GameEndWaitTime 5000
 
@@ -36,9 +36,10 @@ static unsigned char gear2 = 0;
 static unsigned char newGear1 = 0;
 static unsigned char newGear2 = 0;
 
-static unsigned int counter = 0;
+static unsigned int counter = 0; // highest possible number is 65K
 static unsigned int counter1 = 0;
 static unsigned int counter2 = 0;
+static unsigned int counter7Hz1 = 0;
 
 static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
@@ -94,7 +95,22 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-            AUDIO_play(D1);
+           // considering the fact that the case will be coming 10^3 every second.
+            
+            // 7HZ for 2sec 
+            counter7Hz1++;
+            //if (counter7Hz1 == )
+            
+            //increase by 1 hz every 0.25 secs until 25hz. 
+            
+            //25 to 100 in 1 sec
+            
+            //100 to 25 in 1 sec, red light on
+            
+            //25 to 100 in 1 sec, red light on
+            
+            //100 back to 25 in 1 sec, red light on 
+
             LEDRed_out = HIGH;
             
             counter ++;
