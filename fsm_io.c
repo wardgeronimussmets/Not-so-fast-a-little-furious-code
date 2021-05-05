@@ -14,8 +14,8 @@
 /**DEFINES*/
 #define HIGH 1
 #define LOW 0
-#define PRESSED 0
-#define RELEASED 1
+#define PRESSED 1
+#define RELEASED 0
 #define TRUE 1
 #define FALSE 0
 
@@ -43,6 +43,7 @@ void fsm_io_init(void) {
     DC1_OUT = LOW;
     DC2_OUT = LOW;
     DC_DIRECTION = dcForwards;
+    MULT_ENABLE = 0;
     
 }
 void setDirectionDCBW(void)
@@ -66,6 +67,8 @@ void fsm_io(void) {
     ///leds
     CONTR_BD1 = BDLED1_out;
     CONTR_BD2 = BDLED2_out;
+    CONTR_BD1 = 0;
+    CONTR_BD2 = 0;
     
     START_LED_GR = LEDGr_out;
     START_LED_RED = LEDRed_out;

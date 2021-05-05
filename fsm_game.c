@@ -14,8 +14,8 @@
 #include <stdlib.h>
 
 /** D E F I N E S ***************************************************/
-#define PUSHED 0
-#define RELEASED 1
+#define PUSHED 1
+#define RELEASED 0
 
 #define HIGH 1
 #define LOW 0
@@ -70,7 +70,9 @@ static enum{FSM_2_IDLE,FSM_2_FORWARD,FSM_2_BURST,FSM_2_BACKWARDS,FSM_2_GAMEOVER,
  *                  may initialize some counters          
  ********************************************************************/
 void fsm_game_init(void) {
-	//current_state_game = FSM_IDLE;
+	current_state_game = FSM_GAME_IDLE;
+    current_state_car1 = FSM_1_IDLE;
+    current_state_car2 = FSM_2_IDLE;
   
     counter = 0;
     DC2Fw_out = LOW;
@@ -96,7 +98,10 @@ void fsm_game(void) {
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
             AUDIO_stop();
-            if(CONT1_CLUTCH == PUSHED && CONT2_CLUTCH == PUSHED)
+            LEDGr_out = LOW;
+            BDLED1_out = LOW;
+            BDLED2_out = LOW;
+            if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED)
             {
                 current_state_game = FSM_GAME_INITIALISE;
                 counter = 0;
@@ -208,6 +213,7 @@ void fsm_game(void) {
         case FSM_1_IDLE:
             DC1Bw_out = LOW;
             DC1Fw_out = LOW;
+            BDLED1_out = LOW;
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED)) 
             {
                 current_state_car1 = FSM_1_FORWARD;
@@ -216,7 +222,7 @@ void fsm_game(void) {
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED))
             {
                 //false start
-                current_state_car1 = FSM_1_BREAKDOWN;
+                //current_state_car1 = FSM_1_BREAKDOWN;
             }
             break;
         case FSM_1_FORWARD:
@@ -307,6 +313,7 @@ void fsm_game(void) {
         case FSM_2_IDLE:
             DC2Bw_out = LOW;
             DC2Fw_out = LOW;
+            BDLED2_out = LOW;
             if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED)) 
             {
                 current_state_car2 = FSM_2_FORWARD;
@@ -315,7 +322,7 @@ void fsm_game(void) {
             else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED))
             {
                 //false start
-                current_state_car2 = FSM_2_BREAKDOWN;
+                //current_state_car2 = FSM_2_BREAKDOWN;
             }
             break;
         case FSM_2_FORWARD:
