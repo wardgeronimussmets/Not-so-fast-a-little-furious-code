@@ -108,9 +108,9 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-           // considering the fact that the case will be coming 10^3 every second.
+           
             //I need all of the variable to be there original values when the game restarts
-            
+            // considering the fact that the case will be coming 10^3 every second.
             // 7HZ for 2sec. 
             counter7Hz1++; 
             counter7Hz2++;
