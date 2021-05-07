@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- *                 Not so fast a little furious test onedrive sync
+ *                 Not so fast a little furious testward
  *
  *********************************************************************
  * Processor:       PIC18F25K50
