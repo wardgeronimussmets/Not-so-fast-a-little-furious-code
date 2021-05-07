@@ -25,7 +25,7 @@
 #define ADC_CHANNELS    1
 
 
-/*** IO expander configuration *********** 
+/*** IO expander configuration ***********  
  * BE AWARE: When using the IO expander RC7 and RB1 are used for communication
  * RB0 can only be used as output, in this example we use it as CS */
 // #define ENABLE_IOEXP TRUE
