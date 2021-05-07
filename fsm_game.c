@@ -174,7 +174,6 @@ void fsm_game(void) {
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED)) 
             {
                 current_state_car1 = FSM_1_FORWARD;
-                LEDGr_out = HIGH;
                 gear1 = 1;
             }
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED))
