@@ -31,7 +31,7 @@
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 static unsigned char greenLDWasOn = TRUE;
-static unsigned char gear1 = 0; // Are u sure it is assaigned as 0 instead of "0;"
+static unsigned char gear1 = 0;
 static unsigned char gear2 = 0;
 static unsigned char newGear1 = 0;
 static unsigned char newGear2 = 0;
@@ -40,18 +40,10 @@ static unsigned int counter = 0; // highest possible number is 65K
 static unsigned int counter1 = 0;
 static unsigned int counter2 = 0;
 static unsigned int counter7Hz1 = 0;
-static unsigned int counter7Hz2 = 0;
-static unsigned int increasinghzs = 8;
-static unsigned int X = 0;
-static unsigned int Y = 0;
-static unsigned int counter250 = 0;
-static unsigned int counter500 = 0;
-static unsigned int decreasinghzs = 25;
 
 static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
 static unsigned char car2HasBD = FALSE;
-static unsigned char permission = FALSE;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
@@ -108,61 +100,26 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-           
-            //I need all of the variable to be there original values when the game restarts
-            // considering the fact that the case will be coming 10^3 every second.
-            // 7HZ for 2sec. 
-            counter7Hz1++; 
-            counter7Hz2++;
+           // considering the fact that the case will be coming 10^3 every second.
             
-            if (counter7Hz1 % 71 == 0 && counter7Hz1 < 2000) //Note: 71.5 * 14 = 1000. We use 14 because we need on and off.
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
-            counter7Hz2 = 0;
-            }
+            // 7HZ for 2sec 
+            counter7Hz1++;
+            //if (counter7Hz1 == )
             
             //increase by 1 hz every 0.25 secs until 25hz. 
-            if (counter7Hz1 > 1999 && X < 13)
-            {
-            X = 0.25 * 2 * increasinghzs;
-            Y = 250/X;
-            counter250++;
-            if (counter7Hz2 % Y == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
             
-            }
-            if (counter250 == 250)
-            { counter7Hz2 = 0;
-                    counter250 = 0;
-                    increasinghzs++;
-            }
-            }
-            //decrease by 1hz every 0.5 secs until to 7hz  
-            if (X > 13)
-            { permission = TRUE;
-            }
-             if (X > 3 && permission)
-            {
-                X = 0.25 * 2 * decreasinghzs;
-            Y = 500/X;
-            counter500++;
-            if (counter7Hz2 % Y == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+            //25 to 100 in 1 sec
             
-            }
-            if (counter500 == 500)
-            { counter7Hz2 = 0;
-                    counter250 = 0;
-                    decreasinghzs--;
-            }
-            }
+            //100 to 25 in 1 sec, red light on
             
+            //25 to 100 in 1 sec, red light on
             
-            
+            //100 back to 25 in 1 sec, red light on 
 
             LEDRed_out = HIGH;
             
-           // counter ++;
-            if(permission && X < 3)
+            counter ++;
+            if(counter > RedLDWait)
             {
                 current_state_game = FSM_GAME_GO;
                 counter = 0;
