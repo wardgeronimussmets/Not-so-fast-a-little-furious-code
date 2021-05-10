@@ -29,10 +29,10 @@
  * BE AWARE: When using the IO expander RC7 and RB1 are used for communication
  * RB0 can only be used as output, in this example we use it as CS */
 // #define ENABLE_IOEXP TRUE 
-
+/*
 #define IOEXP_DATA          LATCbits.LATC7
 #define IOEXP_CLK           LATBbits.LATB1
-#define IOEXP_CS            LATBbits.LATB0
+#define IOEXP_CS            LATBbits.LATB0*/
 
 
 /*** Audio Configuration *****************/
