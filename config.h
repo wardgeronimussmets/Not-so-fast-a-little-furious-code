@@ -60,27 +60,27 @@
 #define LED1_OUT        LATCbits.LATC1
 #define LED2_OUT        LATCbits.LATC2
 //controller
-#define MULT_S0         PORTBbits.RB4
-#define MULT_S1         PORTBbits.RB3
-#define MULT_S2         PORTBbits.RB2
-#define MULT_ENABLE     PORTAbits.RA4
+#define MULT_S0         LATBbits.LATB4
+#define MULT_S1         LATBbits.LATB3
+#define MULT_S2         LATBbits.LATB2
+#define MULT_ENABLE     LATAbits.LATA4
 #define CONTR_OUT1      PORTBbits.RB7
 #define CONTR_OUT2      PORTCbits.RC6
 //vu meter
-#define CONTR_VU1       PORTAbits.RA7
-#define CONTR_VU2       PORTBbits.RB5
+#define CONTR_VU1       LATAbits.LATA7
+#define CONTR_VU2       LATBbits.LATB5
 //breakdown leds
-#define CONTR_BD1       PORTAbits.RA6
-#define CONTR_BD2       PORTBbits.RB6
+#define CONTR_BD1       LATAbits.LATA6
+#define CONTR_BD2       LATBbits.LATB6
 //starting leds
-#define START_LED_RED    PORTAbits.RA1
-#define START_LED_GR   PORTAbits.RA2
+#define START_LED_RED    LATAbits.LATA1
+#define START_LED_GR     LATAbits.LATA2
 
 
 //dc motor
-#define DC2_OUT         PORTAbits.RA5
-#define DC1_OUT         PORTCbits.RC2
-#define DC_DIRECTION    PORTAbits.RA3 //als hoog gaan ze de ene richting uit en als laag de andere
+#define DC2_OUT         LATAbits.LATA5
+#define DC1_OUT         LATCbits.LATC2
+#define DC_DIRECTION    LATAbits.LATA3 //als hoog gaan ze de ene richting uit en als laag de andere
 
 //end loop switch
 #define END_START_SWITCH2   PORTCbits.RC1
