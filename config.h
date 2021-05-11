@@ -68,8 +68,8 @@
 #define CONTR_VU1       LATAbits.LATA7
 #define CONTR_VU2       LATBbits.LATB5
 //breakdown leds
-#define CONTR_BD1       LATAbits.LATA6
-#define CONTR_BD2       LATBbits.LATB6
+#define CONTR_BD2       LATAbits.LATA6
+#define CONTR_BD1       LATBbits.LATB6
 //starting leds
 #define START_LED_RED    LATAbits.LATA1
 #define START_LED_GR     LATAbits.LATA2

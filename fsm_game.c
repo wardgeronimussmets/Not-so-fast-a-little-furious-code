@@ -24,7 +24,7 @@
 
 #define DCout 1
 
-#define RedLDWait 10000  // we want 10 sec for the little show to happen in the beggining
+#define RedLDWait 3000  // we want 10 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
 #define BURSTWaitTime 2000
 #define GameEndWaitTime 5000
@@ -221,11 +221,11 @@ void fsm_game(void) {
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED))
             {
                 //false start
-                //current_state_car1 = FSM_1_BREAKDOWN;
+                current_state_car1 = FSM_1_BREAKDOWN;
             }
             break;
         case FSM_1_FORWARD:
-            BDLED1_out = HIGH;
+           
            DC1Fw_out = 0.5*DCout;  
           
            //check if a car has finished
@@ -242,7 +242,7 @@ void fsm_game(void) {
             if(CONT1_GEAR5 ==  PUSHED) newGear1 =  5;
             if(CONT1_GEAR6 ==  PUSHED) newGear1 =  6;
             
-        if(newGear1 == gear1)
+        if(newGear1 == gear1 || newGear1 == 0)
         {
             //no gear change
             
