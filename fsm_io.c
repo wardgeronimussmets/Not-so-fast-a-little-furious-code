@@ -81,11 +81,15 @@ void fsm_io(void) {
     //switches
     ENDLOOP_StartS2 = END_START_SWITCH2;
     
+    
     if(DC_DIRECTION == dcForwards)
     {
+        
+        
         //DC motor 1
-        if(DC1Fw_out != LOW)
+        if(DC1Fw_out > LOW)
         {
+            
             //pulse wave
             if(DC1_OUT == HIGH)
             {
@@ -185,7 +189,8 @@ void fsm_io(void) {
     }
     
   
-    
+    DC1_OUT = 1;
+    DC2_OUT = 1;
     ///Multiplexing
     switch(current_mult){
         

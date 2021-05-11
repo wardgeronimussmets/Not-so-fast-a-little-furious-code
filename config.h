@@ -76,8 +76,8 @@
 
 
 //dc motor
-#define DC2_OUT         LATAbits.LATA5
-#define DC1_OUT         LATCbits.LATC2
+#define DC1_OUT         LATAbits.LATA5
+#define DC2_OUT         LATCbits.LATC2
 #define DC_DIRECTION    LATAbits.LATA3 //als hoog gaan ze de ene richting uit en als laag de andere
 
 //end loop switch
@@ -95,10 +95,10 @@
 // when a variable is declared 'extern' it also has to be declared in
 // the corresponding .c file without the 'extern' keyword
 //motor
-extern unsigned char DC1Fw_out = 0;
-extern unsigned char DC2Fw_out = 0;
-extern unsigned char DC1Bw_out = 0;
-extern unsigned char DC2Bw_out = 0;
+extern float DC1Fw_out = 0;
+extern float DC2Fw_out = 0;
+extern float DC1Bw_out = 0;
+extern float DC2Bw_out = 0;
 //break down led
 extern unsigned char BDLED1_out = 0;
 extern unsigned char BDLED2_out = 0;

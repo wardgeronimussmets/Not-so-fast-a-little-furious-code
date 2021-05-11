@@ -226,7 +226,8 @@ void fsm_game(void) {
             break;
         case FSM_1_FORWARD:
            
-           DC1Fw_out = 0.5*DCout;  
+           DC1Fw_out = 0.5f*DCout; 
+           
           
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
