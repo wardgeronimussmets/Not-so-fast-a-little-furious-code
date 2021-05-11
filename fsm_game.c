@@ -26,7 +26,12 @@
 
 #define RedLDWait 3000  // we want 10 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
-#define BURSTWaitTime 2000
+#define BURSTWaitTime 20
+#define BURSTWaitTimeOFF 100
+#define VUWaitTime 1
+#define VUWaitTimeOFF 40
+#define VUTargetCounter 1000
+#define maxBurst 500
 #define GameEndWaitTime 5000
 
 /** P R I V A T E   V A R I A B L E S *******************************/
@@ -35,6 +40,8 @@ static unsigned char gear1 = 0;
 static unsigned char gear2 = 0;
 static unsigned char newGear1 = 0;
 static unsigned char newGear2 = 0;
+static unsigned char clutch1Was = RELEASED;
+static unsigned char clutch2Was = RELEASED;
 
 static unsigned int counter = 0; // highest possible number is 65K
 static unsigned int counter1 = 0;
@@ -55,8 +62,12 @@ static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
 static unsigned char car2HasBD = FALSE;
 
-static unsigned char burtst1Time = 0;
-static unsigned char burtst2Time = 0;
+static unsigned char burst1Time = 0;
+static unsigned char burst2Time = 0;
+static unsigned int vuCounter1 = 0;
+static unsigned int vuCounter2 = 0;
+static unsigned int vuCounter1Limit = 0;
+static unsigned int vuCounter2Limit = 0;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
@@ -223,13 +234,13 @@ void fsm_game(void) {
             DC1Fw_out = LOW;
             BDLED1_out = LOW;
             
-            if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED)) 
+            if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED)) 
             {
                 
                 current_state_car1 = FSM_1_FORWARD;
                 gear1 = 1;
             }
-            else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED))
+            else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED))
             {
                 //false start
                 current_state_car1 = FSM_1_BREAKDOWN;
@@ -254,7 +265,9 @@ void fsm_game(void) {
             if(CONT1_GEAR5 ==  PUSHED) newGear1 =  5;
             if(CONT1_GEAR6 ==  PUSHED) newGear1 =  6;
             
-        if(newGear1 == gear1 || newGear1 == 0)
+            
+            
+        if(newGear1 == gear1 || newGear1 == 0 ||CONT1_CLUTCH == PUSHED )
         {
             //no gear change
             
@@ -262,10 +275,16 @@ void fsm_game(void) {
         else
         {
             //gear1 has been changed
-            if(newGear1 - gear1 == 1 && CONT1_CLUTCH == PUSHED)
+            if(newGear1 - gear1 == 1  && clutch1Was == PUSHED)
             {
                 //correct shift
+                vuCounter1Limit = 0;
                 counter1 = 0;
+                //determine length of burst
+                if(VUTargetCounter-vuCounter1Limit>0)
+                    burst1Time = maxBurst - (VUTargetCounter-vuCounter1Limit);
+                else
+                    burst1Time = maxBurst + (VUTargetCounter-vuCounter1Limit);
                 current_state_car1 = FSM_1_BURST;
                 gear1 = newGear1;
             }
@@ -276,15 +295,17 @@ void fsm_game(void) {
             }
         }
         
-            
+           clutch1Was = CONT1_CLUTCH; 
     
         break;
         case FSM_1_BURST:
             DC1Fw_out = DCout;
             counter1 ++;
-            if(counter1>BURSTWaitTime)
+            LEDRed_out = HIGH;
+            if(counter1>BURSTWaitTime+burst1Time)
             {
                 current_state_car1 = FSM_1_FORWARD;
+                LEDRed_out = LOW;
             }
             
             break;
@@ -362,7 +383,7 @@ void fsm_game(void) {
         else
         {
             //gear1 has been changed
-            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED)
+            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED )
             {
                 //correct shift
                 counter2 = 0;
@@ -375,14 +396,14 @@ void fsm_game(void) {
                 current_state_car2 = FSM_2_BREAKDOWN;
             }
         }
-        
+            
             
     
         break;
         case FSM_2_BURST:
             DC2Fw_out = DCout;
             counter2 ++;
-            if(counter2>BURSTWaitTime)
+            if(counter2>BURSTWaitTime+burst2Time)
             {
                 current_state_car2 = FSM_2_FORWARD;
             }
@@ -417,6 +438,31 @@ void fsm_game(void) {
     } 
     
       /*******************Difficulty with vu************************************/
-    
+    //vu1
+    if(current_state_car1 == FSM_1_FORWARD || current_state_car1 == FSM_1_BURST){
+        if(CONTR_VU1 == HIGH){
+            if(vuCounter1 > VUWaitTime + vuCounter1Limit){
+                CONTR_VU1 = LOW;
+                vuCounter1Limit++;
+            }
+        }
+        else{
+            if(vuCounter1 > VUWaitTimeOFF){
+                CONTR_VU1 = HIGH;
+                vuCounter1Limit ++;
+            }
+        }
+    }
+    else{
+        CONTR_VU1 = LOW;
+    }
+     
+      if(CONT1_CLUTCH == PUSHED) vuCounter1Limit = 0;
+      
+      vuCounter1++;
+      
+      
+      
+      //vu2
     
 }

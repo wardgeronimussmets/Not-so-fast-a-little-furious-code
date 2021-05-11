@@ -65,8 +65,8 @@
 #define CONTR_OUT1      PORTBbits.RB7
 #define CONTR_OUT2      PORTCbits.RC6
 //vu meter
-#define CONTR_VU1       LATAbits.LATA7
-#define CONTR_VU2       LATBbits.LATB5
+#define CONTR_VU2       LATAbits.LATA7
+#define CONTR_VU1       LATBbits.LATB5
 //breakdown leds
 #define CONTR_BD2       LATAbits.LATA6
 #define CONTR_BD1       LATBbits.LATB6
