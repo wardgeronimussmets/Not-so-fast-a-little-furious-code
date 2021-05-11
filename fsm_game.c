@@ -55,6 +55,9 @@ static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
 static unsigned char car2HasBD = FALSE;
 
+static unsigned char burtst1Time = 0;
+static unsigned char burtst2Time = 0;
+
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
 static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER,FSM_1_BREAKDOWN
@@ -62,6 +65,8 @@ static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER
 
 static enum{FSM_2_IDLE,FSM_2_FORWARD,FSM_2_BURST,FSM_2_BACKWARDS,FSM_2_GAMEOVER,FSM_2_BREAKDOWN
             } current_state_car2;
+static enum{FSM_VU1_UP,FSM_VU1_IDLE,FSM_VU1_DOWN} current_state_vu1;
+static enum{FSM_VU2_UP,FSM_VU2_IDLE,FSM_VU2_DOWN} current_state_vu2;
             
 /********************************************************************
  * Function:        void fsm_game_init(void)
@@ -87,6 +92,9 @@ void fsm_game_init(void) {
     LEDGr_out = LOW;
     LEDRed_out = LOW;
 }
+void fsm_vu_init(void){
+
+}
 
 /********************************************************************
  * Function:        void fsm_game(void)
@@ -95,6 +103,9 @@ void fsm_game_init(void) {
  * Output:          None
  * Overview:        An implementation for a simple reaction game
  ********************************************************************/
+void fsm_vu(void){
+    
+}
 void fsm_game(void) {
     
     switch (current_state_game) {                
@@ -405,6 +416,7 @@ void fsm_game(void) {
             break;
     } 
     
+      /*******************Difficulty with vu************************************/
     
     
 }

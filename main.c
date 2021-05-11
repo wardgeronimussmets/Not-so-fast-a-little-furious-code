@@ -41,6 +41,7 @@ void main(void) {
         //**** put here a reference to one or more FSM's
         fsm_io();
         fsm_game();
+        //fsm_vu();
 	}
 }
 
@@ -107,6 +108,7 @@ static void init(void) {
 
     fsm_io_init();
     fsm_game_init();
+    //fsm_vu_init();
        
 #if ENABLE_SERVO == TRUE
     SERVO_init();
