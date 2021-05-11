@@ -25,7 +25,7 @@
 #define DCout 1
 
 #define RedLDWait 10000  // we want 10 sec for the little show to happen in the beggining
-#define GreenLDWait 5000 
+#define GreenLDWait 20000 
 #define BURSTWaitTime 2000
 #define GameEndWaitTime 5000
 
@@ -39,7 +39,17 @@ static unsigned char newGear2 = 0;
 static unsigned int counter = 0; // highest possible number is 65K
 static unsigned int counter1 = 0;
 static unsigned int counter2 = 0;
+
 static unsigned int counter7Hz1 = 0;
+static unsigned int counter7Hz2 = 0;
+static unsigned int increasinghzs = 8;
+static unsigned int X = 0;
+static unsigned int Y = 0;
+static unsigned int counter250 = 0;
+static unsigned int counter500 = 0;
+static unsigned int decreasinghzs = 25;
+
+static unsigned char permission = FALSE;
 
 static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
@@ -91,8 +101,7 @@ void fsm_game(void) {
         case FSM_GAME_IDLE:          
             AUDIO_stop();
             LEDGr_out = LOW;
-            BDLED1_out = LOW;
-            BDLED2_out = LOW;
+            LEDRed_out = LOW;
             if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED)
             {
                 current_state_game = FSM_GAME_INITIALISE;
@@ -102,20 +111,51 @@ void fsm_game(void) {
         case FSM_GAME_INITIALISE:
            // considering the fact that the case will be coming 10^3 every second.
             
-            // 7HZ for 2sec 
-            counter7Hz1++;
-            //if (counter7Hz1 == )
-            
-            //increase by 1 hz every 0.25 secs until 25hz. 
-            
-            //25 to 100 in 1 sec
-            
-            //100 to 25 in 1 sec, red light on
-            
-            //25 to 100 in 1 sec, red light on
-            
-            //100 back to 25 in 1 sec, red light on 
+            // considering the fact that the case will be coming 10^3 every second.
+            // 7HZ for 2sec. 
+            counter7Hz1++; 
+            counter7Hz2++;
 
+            if (counter7Hz1 % 71 == 0 && counter7Hz1 < 2000) //Note: 71.5 * 14 = 1000. We use 14 because we need on and off.
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+            counter7Hz2 = 0;
+            }
+
+            //increase by 1 hz every 0.25 secs until 25hz. 
+            if (counter7Hz1 > 1999 && X < 13)
+            {
+            X = 0.25 * 2 * increasinghzs; //initial value of increasinghzs is 8hzs
+            Y = 250/X;
+            counter250++;
+            if (counter7Hz2 % Y == 0)
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+
+            }
+            if (counter250 == 250)
+            { counter7Hz2 = 0;
+                    counter250 = 0;
+                    increasinghzs++;
+            }
+            }
+            //decrease by 1hz every 0.5 secs until to 7hz
+            if (X > 13)
+            { permission = TRUE;
+            }
+             if (X > 3 && permission)
+            {
+                X = 0.25 * 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
+            Y = 500/X;
+            counter500++;
+            if (counter7Hz2 % Y == 0)
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+
+            }
+            if (counter500 == 500)
+            { counter7Hz2 = 0;
+                    counter250 = 0;
+                    decreasinghzs--;
+            }
+            }
             LEDRed_out = HIGH;
             
             counter ++;
@@ -171,8 +211,10 @@ void fsm_game(void) {
             DC1Bw_out = LOW;
             DC1Fw_out = LOW;
             BDLED1_out = LOW;
+            
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED)) 
             {
+                
                 current_state_car1 = FSM_1_FORWARD;
                 gear1 = 1;
             }
@@ -183,8 +225,9 @@ void fsm_game(void) {
             }
             break;
         case FSM_1_FORWARD:
-            
+            BDLED1_out = HIGH;
            DC1Fw_out = 0.5*DCout;  
+          
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
                current_state_car1 = FSM_1_GAMEOVER;
@@ -270,7 +313,7 @@ void fsm_game(void) {
         case FSM_2_IDLE:
             DC2Bw_out = LOW;
             DC2Fw_out = LOW;
-            BDLED2_out = LOW;
+            //BDLED2_out = LOW;
             if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED)) 
             {
                 current_state_car2 = FSM_2_FORWARD;

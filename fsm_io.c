@@ -66,9 +66,10 @@ void setDirectionDCFW(void)
 void fsm_io(void) {
     ///leds
     CONTR_BD1 = BDLED1_out;
+    //CONTR_BD1 = 1;
     CONTR_BD2 = BDLED2_out;
-    CONTR_BD1 = 0;
-    CONTR_BD2 = 0;
+    //CONTR_BD2 = 1;
+
     
     START_LED_GR = LEDGr_out;
     START_LED_RED = LEDRed_out;

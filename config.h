@@ -48,9 +48,7 @@
 /* If you are using a servo specify how many you are using
  * for every servo you need to alter the SERVO_ISR() method in func_servo.c 
  * to update the outputs for the servo's */
-#define SERVO_CHANNELS 1
 
-#define SERVO_0_OUT LATBbits.LATB7
 // #define SERVO_1_OUT LATBbits.LATB6
 // #define SERVO_2_OUT LATBbits.LATB5
 
