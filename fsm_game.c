@@ -460,6 +460,7 @@ void fsm_game(void) {
       if(CONT1_CLUTCH == PUSHED) vuCounter1Limit = 0;
       
       vuCounter1++;
+      CONTR_VU1 = HIGH;
       
       
       

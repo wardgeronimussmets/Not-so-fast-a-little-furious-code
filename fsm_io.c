@@ -188,9 +188,8 @@ void fsm_io(void) {
         }
     }
     
-  
-    DC1_OUT = 1;
-    DC2_OUT = 1;
+    
+    
     ///Multiplexing
     switch(current_mult){
         
