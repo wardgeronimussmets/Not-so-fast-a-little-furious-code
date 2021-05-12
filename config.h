@@ -43,14 +43,15 @@
 
 
 /*** Servo Configuration *****************/
-// #define ENABLE_SERVO TRUE
+#define ENABLE_SERVO TRUE
 
 /* If you are using a servo specify how many you are using
  * for every servo you need to alter the SERVO_ISR() method in func_servo.c 
  * to update the outputs for the servo's */
+#define SERVO_CHANNELS 2
 
-// #define SERVO_1_OUT LATBbits.LATB6
-// #define SERVO_2_OUT LATBbits.LATB5
+#define SERVO_2_OUT       LATAbits.LATA7
+#define SERVO_1_OUT       LATBbits.LATB5
 
 /* Define all out- and inputs with readable names */
 //microController
@@ -64,9 +65,8 @@
 #define MULT_ENABLE     LATAbits.LATA4
 #define CONTR_OUT1      PORTBbits.RB7
 #define CONTR_OUT2      PORTCbits.RC6
-//vu meter
-#define CONTR_VU2       LATAbits.LATA7
-#define CONTR_VU1       LATBbits.LATB5
+
+
 //breakdown leds
 #define CONTR_BD2       LATAbits.LATA6
 #define CONTR_BD1       LATBbits.LATB6

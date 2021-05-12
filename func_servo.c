@@ -91,9 +91,9 @@ void SERVO_ISR(void) {
         servo_counter = (servo_counter + 1u) % 30;
         
         /**** PWM logic for toggling on setpoint *******/
-        SERVO_0_OUT = (unsigned)(servo_setpoint[0] > servo_counter);
-        //SERVO_1_OUT = (unsigned)(servo_setpoint[1] > servo_counter);
-        //SERVO_2_OUT = (unsigned)(servo_setpoint[2] > servo_counter);
+        //SERVO_0_OUT = (unsigned)(servo_setpoint[0] > servo_counter);
+        SERVO_1_OUT = (unsigned)(servo_setpoint[1] > servo_counter);
+        SERVO_2_OUT = (unsigned)(servo_setpoint[2] > servo_counter);
         /**********************************************/
         
         if (servo_counter == 0) { 

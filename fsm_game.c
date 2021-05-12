@@ -68,6 +68,11 @@ static unsigned int vuCounter1 = 0;
 static unsigned int vuCounter2 = 0;
 static unsigned int vuCounter1Limit = 0;
 static unsigned int vuCounter2Limit = 0;
+static unsigned int servoCounter1 = 0;
+static unsigned int servoCounter2 = 0;
+static unsigned char servo1DirectionRight = TRUE;
+
+static unsigned char wasPRGBUTTON = 0;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
@@ -98,10 +103,12 @@ void fsm_game_init(void) {
     DC2Bw_out = LOW;
     BDLED1_out = LOW;
     BDLED2_out = LOW;
-    CONTR_VU1 = LOW;
-    CONTR_VU2 = LOW;
+    //SERVO_1_OUT = LOW;
+    //SERVO_2_OUT = LOW;
     LEDGr_out = LOW;
     LEDRed_out = LOW;
+    
+    SERVO_setPosition(1,0);
 }
 void fsm_vu_init(void){
 
@@ -438,32 +445,72 @@ void fsm_game(void) {
     } 
     
       /*******************Difficulty with vu************************************/
-    //vu1
+    /*//vu1
     if(current_state_car1 == FSM_1_FORWARD || current_state_car1 == FSM_1_BURST){
-        if(CONTR_VU1 == HIGH){
+        if(SERVO_1_OUT == HIGH){
             if(vuCounter1 > VUWaitTime + vuCounter1Limit){
-                CONTR_VU1 = LOW;
+                SERVO_1_OUT = LOW;
                 vuCounter1Limit++;
             }
         }
         else{
             if(vuCounter1 > VUWaitTimeOFF){
-                CONTR_VU1 = HIGH;
+                SERVO_1_OUT = HIGH;
                 vuCounter1Limit ++;
             }
         }
     }
     else{
-        CONTR_VU1 = LOW;
+        SERVO_1_OUT = LOW;
     }
      
       if(CONT1_CLUTCH == PUSHED) vuCounter1Limit = 0;
       
       vuCounter1++;
-      CONTR_VU1 = HIGH;
+      SERVO_1_OUT = HIGH;
       
       
       
       //vu2
-    
+    */
+      
+     //servo test
+     /* 
+      if(servoCounter1 > 500){
+        servoCounter1 = 0;  
+        if(LED1_OUT == 1)
+            LED1_OUT = 0;
+        else
+            LED1_OUT = 1;
+        unsigned char servPos = SERVO_getPosition(1);
+        if(servPos>24){
+           servo1DirectionRight = FALSE;
+           LED2_OUT = 1;
+        }
+         if(servPos<1)
+            servo1DirectionRight = TRUE;
+        if(servo1DirectionRight)
+                SERVO_setPosition(1,servPos +1);
+        else
+            SERVO_setPosition(1,servPos +1);
+      }
+      
+      
+      servoCounter1++;
+       */
+      
+      if(PRG_BUTTON == PUSHED && wasPRGBUTTON == RELEASED){
+          unsigned char servPos = SERVO_getPosition(1);
+          SERVO_setPosition(1,servPos +1);
+          
+          
+          if(LED1_OUT == 1)
+            LED1_OUT = 0;
+        else
+            LED1_OUT = 1;
+          
+      }
+      //else SERVO_1_OUT = LOW;
+      wasPRGBUTTON =  PRG_BUTTON;
+          
 }

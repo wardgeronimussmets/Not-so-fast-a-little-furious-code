@@ -36,7 +36,7 @@ static unsigned char timed_to_1ms(void);
  * Overview:        Main program entry point
  ********************************************************************/
 void main(void) {
-	init();						//initialize the system
+	init();	//initialize the system
 	while(timed_to_1ms()) {
         //**** put here a reference to one or more FSM's
         fsm_io();
@@ -108,6 +108,7 @@ static void init(void) {
 
     fsm_io_init();
     fsm_game_init();
+    SERVO_init();
     //fsm_vu_init();
        
 #if ENABLE_SERVO == TRUE
