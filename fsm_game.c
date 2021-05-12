@@ -71,6 +71,7 @@ static unsigned int vuCounter2Limit = 0;
 static unsigned int servoCounter1 = 0;
 static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
+static unsigned char servPos = 0;
 
 static unsigned char wasPRGBUTTON = 0;
 
@@ -500,14 +501,21 @@ void fsm_game(void) {
        */
       
       if(PRG_BUTTON == PUSHED && wasPRGBUTTON == RELEASED){
-          unsigned char servPos = SERVO_getPosition(1);
-          SERVO_setPosition(1,servPos +1);
+          //servPos = SERVO_getPosition(1);
+          //SERVO_setPosition(1,servPos +1);
           
           
-          if(LED1_OUT == 1)
+          
+          if(LED1_OUT == 1){
             LED1_OUT = 0;
-        else
+            SERVO_setPosition(1,20);
+            SERVO_setPosition(2,20);
+          }
+          else{
             LED1_OUT = 1;
+            SERVO_setPosition(1,0);
+            SERVO_setPosition(2,0);
+          }
           
       }
       //else SERVO_1_OUT = LOW;
