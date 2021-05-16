@@ -27,7 +27,7 @@
 #define RedLDWait 1000  // we want 13 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
 #define BURSTWaitTime 20
-#define BURSTWaitTimeOFF 100
+#define BURSTWaitTimeOFF 20
 #define VUWaitTime 1
 #define VUWaitTimeOFF 40
 #define VUTargetCounter 1000
@@ -137,38 +137,26 @@ void fsm_vu(void){
     
 }
 void fsm_game(void) {
-    switch(scar1){
-        case SCAR1_IDLE:
-            DC1_OUT = 0;
-            break;
-        case SCAR1_DRIVE:
-            dcCounter1 ++;
-            if(DC1ON == 1 && dcCounter1 > dcONTime){
-                DC1_OUT = 0;
-                DC1ON = 0;
-                dcCounter1 = 0;
-            }
-            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
-                DC1_OUT = 1;
-                DC1ON = 1;
-                dcCounter1 = 0;
-            }
-            
-                
-            break;
-        case SCAR1_BURST:
-            dcCounter1 ++;
-            if(DC1ON == 1 && dcCounter1 > (dcONTime*2)){
-                DC1_OUT = 0;
-                DC1ON = 0;
-                dcCounter1 = 0;
-            }
-            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
-                DC1_OUT = 1;
-                DC1ON = 1;
-                dcCounter1 = 0;
-            }
-    }
+//    switch(scar1){
+//        case SCAR1_IDLE:
+//            DC1_OUT = 0;
+//            break;
+//        case SCAR1_DRIVE:
+//            dcCounter1 ++;
+//            if(DC1ON == 1 && dcCounter1 > dcONTime){
+//                DC1_OUT = 0;
+//                DC1ON = 0;
+//                dcCounter1 = 0;
+//            }
+//            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
+//                DC1_OUT = 1;
+//                DC1ON = 1;
+//                dcCounter1 = 0;
+//            }  
+//            
+//            break;
+//        
+//    }
     
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
@@ -301,15 +289,17 @@ void fsm_game(void) {
     {
         
         case FSM_1_IDLE:
-            DC1Bw_out = LOW;
-            DC1Fw_out = LOW;
-            scar1 = SCAR1_IDLE;
+//            DC1Bw_out = LOW;
+//            DC1Fw_out = LOW;
+//            scar1 = SCAR1_IDLE;
+            DC1_OUT = 0;
             BDLED1_out = LOW;
             
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED)) 
             {
                 
-                current_state_car1 = FSM_1_FORWARD;
+                current_state_car1 = FSM_1_BURST;
+                burst1Time = 100000;
                 gear1 = 1;
             }
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED))
@@ -320,9 +310,10 @@ void fsm_game(void) {
             break;
         case FSM_1_FORWARD:
            
-           DC1Fw_out = 0.5f*DCout; 
-           scar1 = SCAR1_DRIVE;
-           
+//           DC1Fw_out = 0.5f*DCout; 
+//           scar1 = SCAR1_IDLE;
+            DC1_OUT = 0;
+            boostCounter1 ++;
           
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
@@ -343,7 +334,7 @@ void fsm_game(void) {
         if(newGear1 == gear1 || newGear1 == 0 ||CONT1_CLUTCH == PUSHED )
         {
             //no gear change
-            boostCounter1 ++;
+            
             
         }
         else
@@ -352,7 +343,8 @@ void fsm_game(void) {
             if(newGear1 - gear1 == 1  && clutch1Was == PUSHED)
             {
                 //correct shift
-                
+                burst1Time = boostCounter1;
+                boostCounter1 = 0;
                 current_state_car1 = FSM_1_BURST;
                 gear1 = newGear1;
             }
@@ -367,14 +359,16 @@ void fsm_game(void) {
     
         break;
         case FSM_1_BURST:
-            scar1 = SCAR1_BURST;
-            DC1Fw_out = DCout;
+//            scar1 = SCAR1_DRIVE;
+//            DC1Fw_out = DCout;
+            DC1_OUT = 1;
             counter1 ++;
             LEDRed_out = HIGH;
-            if(counter1>BURSTWaitTime+burst1Time)
+            if(counter1>burst1Time)
             {
                 current_state_car1 = FSM_1_FORWARD;
                 LEDRed_out = LOW;
+                counter1 = 0;
             }
             
             break;
