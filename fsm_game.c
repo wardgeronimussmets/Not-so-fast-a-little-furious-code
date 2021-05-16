@@ -78,6 +78,8 @@ static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
 
+static unsigned char boostCounter1 = 0;
+
 static unsigned char DC1ON = 0;
 static unsigned int dcCounter1 = 0;
 
@@ -154,6 +156,18 @@ void fsm_game(void) {
             
                 
             break;
+        case SCAR1_BURST:
+            dcCounter1 ++;
+            if(DC1ON == 1 && dcCounter1 > (dcONTime*2)){
+                DC1_OUT = 0;
+                DC1ON = 0;
+                dcCounter1 = 0;
+            }
+            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
+                DC1_OUT = 1;
+                DC1ON = 1;
+                dcCounter1 = 0;
+            }
     }
     
     switch (current_state_game) {                
@@ -329,6 +343,7 @@ void fsm_game(void) {
         if(newGear1 == gear1 || newGear1 == 0 ||CONT1_CLUTCH == PUSHED )
         {
             //no gear change
+            boostCounter1 ++;
             
         }
         else
@@ -337,13 +352,7 @@ void fsm_game(void) {
             if(newGear1 - gear1 == 1  && clutch1Was == PUSHED)
             {
                 //correct shift
-                vuCounter1Limit = 0;
-                counter1 = 0;
-                //determine length of burst
-                if(VUTargetCounter-vuCounter1Limit>0)
-                    burst1Time = maxBurst - (VUTargetCounter-vuCounter1Limit);
-                else
-                    burst1Time = maxBurst + (VUTargetCounter-vuCounter1Limit);
+                
                 current_state_car1 = FSM_1_BURST;
                 gear1 = newGear1;
             }
@@ -358,6 +367,7 @@ void fsm_game(void) {
     
         break;
         case FSM_1_BURST:
+            scar1 = SCAR1_BURST;
             DC1Fw_out = DCout;
             counter1 ++;
             LEDRed_out = HIGH;
