@@ -80,9 +80,11 @@ static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
 
 static unsigned int boostCounter1 = 0;
+static unsigned int revBigCounter1 = 0;
 
 static unsigned char DC1ON = 0;
 static unsigned int dcCounter1 = 0;
+static unsigned int revCounter1 = 0;
 
 static unsigned char wasPRGBUTTON = 0;
 static enum {SCAR1_BURST,SCAR1_DRIVE,SCAR1_IDLE} scar1;
@@ -341,6 +343,7 @@ void fsm_game(void) {
             if(newGear1 - gear1 == 1  && clutch1Was == PUSHED)
             {
                 //correct shift
+                revBigCounter1 = 0;
                 burst1Time = boostCounter1;
                 boostCounter1 = 0;
                 current_state_car1 = FSM_1_BURST;
@@ -372,6 +375,7 @@ void fsm_game(void) {
             break;
         case FSM_1_BREAKDOWN:
             DC1Fw_out = LOW;
+            DC1_OUT = 0;
             CAR1_BREAKDOWN = TRUE;
             car1HasBD = TRUE;
             BDLED1_out = HIGH;
@@ -399,6 +403,20 @@ void fsm_game(void) {
         default:
             current_state_car1 = FSM_1_IDLE;
             break;
+    }
+    //rev1
+    revCounter1 = revCounter1 + 5;
+    revBigCounter1 ++;
+    //if boostCounter biggger than 4000 then it should decrease again
+    if(current_state_car1 == FSM_1_FORWARD){
+        if(REV1 == 1 && revCounter1 > 4000 - revBigCounter1){
+            REV1 = 0;
+            revCounter1 = 0;
+        }
+        else if(REV1 == 0 && revCounter1 > revBigCounter1 ){
+            REV1 = 1;
+            revCounter1 = 0;
+        }
     }
     /*******************************************************************************************************************************************/
     
