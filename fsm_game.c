@@ -487,50 +487,13 @@ void fsm_game(void) {
       //vu2
     */
       
-     //servo test
-     /* 
-      if(servoCounter1 > 500){
-        servoCounter1 = 0;  
-        if(LED1_OUT == 1)
-            LED1_OUT = 0;
-        else
-            LED1_OUT = 1;
-        unsigned char servPos = SERVO_getPosition(1);
-        if(servPos>24){
-           servo1DirectionRight = FALSE;
-           LED2_OUT = 1;
+     if(ENDLOOP_StartS1 == 1){
+         DC1_OUT = 1;
+         DC2_OUT = 1;
         }
-         if(servPos<1)
-            servo1DirectionRight = TRUE;
-        if(servo1DirectionRight)
-                SERVO_setPosition(1,servPos +1);
-        else
-            SERVO_setPosition(1,servPos +1);
-      }
-      
-      
-      servoCounter1++;
-       */
-      
-      if(PRG_BUTTON == PUSHED && wasPRGBUTTON == RELEASED){
-          //servPos = SERVO_getPosition(1);
-          //SERVO_setPosition(1,servPos +1);
-          
-          
-          
-          if(LED1_OUT == 1){
-            LED1_OUT = 0;
-            SERVO_setPosition(1,20);
-            SERVO_setPosition(2,20);
-          }
           else{
-            LED1_OUT = 1;
-            SERVO_setPosition(1,0);
-            SERVO_setPosition(2,0);
+         DC1_OUT = 0;
+         DC2_OUT = 0;
           }
           
       }
-      //else SERVO_1_OUT = LOW;
-      wasPRGBUTTON =  PRG_BUTTON;
-          
-}
