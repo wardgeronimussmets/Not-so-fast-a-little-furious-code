@@ -73,8 +73,8 @@ void fsm_io(void) {
     //REV2 = 1;
     //LED2_OUT
     
-    START_LED_GR = 0;//LEDGr_out;
-    START_LED_RED = 0;//LEDRed_out;
+    START_LED_GR = LEDGr_out;
+    START_LED_RED = LEDRed_out;
     
     ///dc motors
     dcCounter1 ++;
@@ -83,142 +83,20 @@ void fsm_io(void) {
     //switches
     ENDLOOP_StartS2 = END_START_SWITCH2;
     
-    /*if(REV1 == 1 && dcCounter1 > 20){
+    if(REV1 == 1 && dcCounter1 > 20){
         DC1_OUT = 0;
         REV1 = 0;
         dcCounter1 = 0;
         
     }
-    else if(REV1 == 0 && dcCounter1 > 20){
+    else if(REV1 == 0 && dcCounter1 > 200){
         DC1_OUT = 1;
         REV1 = 1;
         dcCounter1 = 0;
-    }*/
+    }
     
         
-        /*
-        //DC motor 1
-        if(DC1Fw_out > LOW)
-        {
-            
-            //pulse wave
-            if(DC1_OUT == HIGH)
-            {
-                if(dcCounter1 > dcONTime*DC1Fw_out)
-                {
-                    dcCounter1 = 0;
-                    DC1_OUT == LOW;
-                
-                }
-            }
-            else
-            {
-               if(dcCounter1 > dcOFFTime*DC1Fw_out)
-                {
-                    dcCounter1 = 0;
-                    DC1_OUT == LOW;
-                
-                } 
-            }
-        }
-        else
-        {
-            DC1_OUT = LOW;
-        }
-        //DC motor 2
-        if(DC2Fw_out != LOW)
-        {
-            //pulse wave
-            if(DC2_OUT == HIGH)
-            {
-                if(dcCounter2 > dcONTime*DC2Fw_out)
-                {
-                    dcCounter2 = 0;
-                    DC2_OUT == LOW;
-                
-                }
-            }
-            else
-            {
-               if(dcCounter2 > dcOFFTime*DC2Fw_out)
-                {
-                    dcCounter2 = 0;
-                    DC2_OUT == LOW;
-                
-                } 
-            }
-        }
-        else
-        {
-            DC2_OUT = LOW;
-        }
-    }
-    else
-    {
-        //dc motor 1
-        if(DC1Bw_out != LOW)
-        {
-            //pulse wave
-            if(DC1_OUT == HIGH)
-            {
-                if(dcCounter1>dcONTime)
-                {
-                    dcCounter1 == 0;
-                    DC1_OUT == LOW;
-                }
-            }
-            else
-            {
-                if(dcCounter1>dcOFFTime)
-                {
-                    dcCounter1 == 0;
-                    DC1_OUT == LOW;
-                }
-            }
-        }
-        //dc motor 2
-        if(DC2Bw_out != LOW)
-        {
-            //pulse wave
-            if(DC2_OUT == HIGH)
-            {
-                if(dcCounter2>dcONTime)
-                {
-                    dcCounter2 == 0;
-                    DC2_OUT == LOW;
-                }
-            }
-            else
-            {
-                if(dcCounter2>dcOFFTime)
-                {
-                    dcCounter2 == 0;
-                    DC2_OUT == LOW;
-                }
-            }
-        }
-    }
-   */
-    
-    /*if(REV1 == 1 && dcCounter1 > 20){
-        DC1_OUT = 0;
-        REV1 = 0;
-        dcCounter1 = 0;
-        
-    }
-    else if(REV1 == 0 && dcCounter1 > 20){
-        DC1_OUT = 1;
-        REV1 = 1;
-        dcCounter1 = 0;
-    }*/
-    if(PRG_BUTTON == 0 ){
-        DC1_OUT =1;
-        //DC2_OUT = 1;
-    }
-    else{
-        DC1_OUT = 0;
-       // DC2_OUT = 0;
-    }
+       
     
     
     ///Multiplexing

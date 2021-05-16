@@ -24,7 +24,7 @@
 
 #define DCout 1
 
-#define RedLDWait 13000  // we want 10 sec for the little show to happen in the beggining
+#define RedLDWait 3000  // we want 13 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
 #define BURSTWaitTime 20
 #define BURSTWaitTimeOFF 100
@@ -497,13 +497,4 @@ void fsm_game(void) {
       //vu2
     */
       
-     if(ENDLOOP_StartS1 == 1){
-         DC1_OUT = 1;
-         DC2_OUT = 1;
-        }
-          else{
-         DC1_OUT = 0;
-         DC2_OUT = 0;
-          }
-          
-      }
+}
