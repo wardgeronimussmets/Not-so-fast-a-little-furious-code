@@ -40,6 +40,7 @@
 
 /* Specify the pin for your audio output, every digital output can be used */
 #define AUDIO_OUT           LATAbits.LATA0
+#define AUDIO_OUT2           LATAbits.LATA2
 
 
 /*** Servo Configuration *****************/

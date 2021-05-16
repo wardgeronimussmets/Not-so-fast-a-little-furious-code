@@ -47,8 +47,9 @@ static unsigned int counter = 0; // highest possible number is 65K
 static unsigned int counter1 = 0;
 static unsigned int counter2 = 0;
 
-static unsigned int counter7Hz1 = 0;
+static unsigned int counter7Hz1 = 0; 
 static unsigned int counter7Hz2 = 0;
+static unsigned int countergreen = 0;
 static unsigned int increasinghzs = 8;
 static unsigned int X = 0;
 static unsigned int Y = 0;
@@ -130,7 +131,7 @@ void fsm_game(void) {
     
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
-            AUDIO_stop();
+        
             LEDGr_out = LOW;
             LEDRed_out = LOW;
             if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED || PRG_BUTTON == 0)
@@ -140,25 +141,27 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-            // considering the fact that the case will be coming 10^3 every second.
-            // 7HZ for 2sec. 
+            /*************************CUSTOM STARTING AUDIO*****************************************/
+            // 9HZ for 2sec. 
             counter7Hz1++; 
             counter7Hz2++;
 
-            if (counter7Hz1 % 71 == 0 && counter7Hz1 < 2000) //Note: 71.5 * 14 = 1000. We use 14 because we need on and off.
+            if (counter7Hz1 % 55 == 0 && counter7Hz1 < 2000) //Note: 55.5 * 18 = 1000. We use 14 because we need on and off.
             { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
             counter7Hz2 = 0;
             }
 
             //increase by 1 hz every 0.25 secs until 25hz. (for 4.5 secs)
             if (counter7Hz1 > 1999 && X < 51)
             {
-                X = 2 * increasinghzs; //initial value of increasinghzs is 8hzs; 
+                X = 2 * increasinghzs; //initial value of increasinghzs is 10hzs; 
                 Y = 1000/X; 
                 Z = (unsigned int) Y;
                 counter250++; //this counter decide how frequently we need to change the "Frequency nob" in the machine.
                 if (counter7Hz2 % Z == 0)
                 { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                     AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
                 }
                 
                
@@ -171,10 +174,11 @@ void fsm_game(void) {
         
             if (X > 51)
             { permission = TRUE;
+                increasinghzs = 10;
             }
            
             //decrease by 1hz every 0.2 secs until to 7hz
-             if (X > 13 && permission)
+             if (X > 19 && permission)
             {
                     X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
                     Y = 1000/X;
@@ -182,6 +186,7 @@ void fsm_game(void) {
                     counter500++;
                     if (counter7Hz2 % Z == 0)
                     { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                         AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
 
                     }
             
@@ -192,12 +197,13 @@ void fsm_game(void) {
                     }
             }
             
-           if (decreasinghzs == 7)
-             { counter7Hz1 = 0; 
-                }
-               
+           if (decreasinghzs == 7)  
+            { counter7Hz1 = 0; 
+                decreasinghzs = 25;
+                X = 0; 
+           }
             
-           
+         /*******************************CUSTOM AUDIO FINISHES***********************************/    
             LEDRed_out = HIGH;
             
             counter ++;
@@ -208,7 +214,11 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_GO:
-            AUDIO_play(D2);
+            countergreen++;
+            if (countergreen % 55 == 0) // keep on playing at 9HZs
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                 AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
+            }
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
@@ -403,7 +413,7 @@ void fsm_game(void) {
         else
         {
             //gear1 has been changed
-            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED )
+            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED)
             {
                 //correct shift
                 counter2 = 0;
