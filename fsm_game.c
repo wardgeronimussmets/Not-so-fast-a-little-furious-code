@@ -81,6 +81,7 @@ static unsigned char servPos = 0;
 
 static unsigned int boostCounter1 = 0;
 static unsigned int revBigCounter1 = 0;
+static unsigned int revBigCounterReducer1 = 0;
 
 static unsigned char DC1ON = 0;
 static unsigned int dcCounter1 = 0;
@@ -314,7 +315,9 @@ void fsm_game(void) {
 //           scar1 = SCAR1_IDLE;
             DC1_OUT = 0;
             boostCounter1 ++;
-          
+            if(boostCounter1 > 5000){
+                current_state_car1 = FSM_1_BREAKDOWN;
+            }
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
                current_state_car1 = FSM_1_GAMEOVER;
@@ -406,17 +409,29 @@ void fsm_game(void) {
     }
     //rev1
     revCounter1 = revCounter1 + 5;
+    revBigCounterReducer1 ++;
     revBigCounter1 ++;
+    if(revBigCounterReducer1 > 2){
+        revBigCounter1 --;
+        revBigCounterReducer1 = 0;
+    }
     //if boostCounter biggger than 4000 then it should decrease again
     if(current_state_car1 == FSM_1_FORWARD){
-        if(REV1 == 1 && revCounter1 > 4000 - revBigCounter1){
+        if(REV1 == 1 && revCounter1 > revBigCounter1){
             REV1 = 0;
             revCounter1 = 0;
         }
-        else if(REV1 == 0 && revCounter1 > revBigCounter1 ){
+        else if(REV1 == 0 && revCounter1 > 80){
             REV1 = 1;
             revCounter1 = 0;
         }
+    }
+    else{
+        revBigCounter1 = 0;
+        revCounter1 = 0;
+    }
+    if(revBigCounter1 > 2000){
+        REV1 = 1;
     }
     /*******************************************************************************************************************************************/
     
