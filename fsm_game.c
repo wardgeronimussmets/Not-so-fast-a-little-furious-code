@@ -176,20 +176,20 @@ void fsm_game(void) {
             //decrease by 1hz every 0.2 secs until to 7hz
              if (X > 13 && permission)
             {
-                X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
-                 Y = 1000/X;
-                Z = (unsigned int) Y;
-                counter500++;
-                if (counter7Hz2 % Z == 0)
-                { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                    X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
+                    Y = 1000/X;
+                    Z = (unsigned int) Y;
+                    counter500++;
+                    if (counter7Hz2 % Z == 0)
+                    { AUDIO_OUT = (unsigned) !AUDIO_OUT;
 
-                 }
+                    }
             
-                if (counter500 == 200) // because we want to decrease every 0.2 seconds
-                { counter7Hz2 = 0; 
-                    counter500 = 0;
-                    decreasinghzs--;
-                }
+                    if (counter500 == 200) // because we want to decrease every 0.2 seconds
+                    { counter7Hz2 = 0; 
+                        counter500 = 0;
+                        decreasinghzs--;
+                    }
             }
             
            if (decreasinghzs == 7)
