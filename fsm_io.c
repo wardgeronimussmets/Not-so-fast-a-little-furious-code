@@ -19,12 +19,16 @@
 #define TRUE 1
 #define FALSE 0
 
-
-
+#define dcONTime 200
+#define dcOFFTime 1000
+#define dcForwards 1
+#define dcBackwards 0
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 
 static enum {MULT_A0,MULT_A1,MULT_A2,MULT_A3,MULT_A4,MULT_A5,MULT_A6,MULT_A7,MULT_None}current_mult;
+static int dcCounter1 = 0;
+static int dcCounter2 = 0;
             
 /********************************************************************
  * Function:        void fsm_io_init(void)
@@ -36,10 +40,20 @@ static enum {MULT_A0,MULT_A1,MULT_A2,MULT_A3,MULT_A4,MULT_A5,MULT_A6,MULT_A7,MUL
  ********************************************************************/
 void fsm_io_init(void) {
     current_mult = MULT_A0;
+    DC1_OUT = LOW;
+    DC2_OUT = LOW;
+    DC_DIRECTION = dcForwards;
     MULT_ENABLE = 0;
     
 }
-
+void setDirectionDCBW(void)
+{
+    DC_DIRECTION = dcBackwards;
+}
+void setDirectionDCFW(void)
+{
+    DC_DIRECTION = dcForwards;
+}
 
 /********************************************************************
  * Function:        fsm_io(void)
@@ -62,11 +76,24 @@ void fsm_io(void) {
     START_LED_GR = LEDGr_out;
     START_LED_RED = LEDRed_out;
     
+    ///dc motors
+    dcCounter1 ++;
+    dcCounter2 ++;
     
     //switches
     ENDLOOP_StartS2 = END_START_SWITCH2;
     
-    
+    if(REV1 == 1 && dcCounter1 > 20){
+        DC1_OUT = 0;
+        REV1 = 0;
+        dcCounter1 = 0;
+        
+    }
+    else if(REV1 == 0 && dcCounter1 > 200){
+        DC1_OUT = 1;
+        REV1 = 1;
+        dcCounter1 = 0;
+    }
     
         
        

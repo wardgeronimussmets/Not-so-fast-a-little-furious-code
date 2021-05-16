@@ -34,9 +34,6 @@
 #define maxBurst 500
 #define GameEndWaitTime 5000
 
-#define dcONTime 50
-#define dcOFFTime 200
-
 /** P R I V A T E   V A R I A B L E S *******************************/
 static unsigned char greenLDWasOn = TRUE;
 static unsigned char gear1 = 0;
@@ -77,14 +74,10 @@ static unsigned int servoCounter1 = 0;
 static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
-static int dcCounter1 = 0;
-static int dcCounter2 = 0;
-static unsigned char dc1ON = FALSE;
 
 static unsigned char wasPRGBUTTON = 0;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
-static enum {CAR1_Full_Beans,CAR1_Drive,CAR1_Reverse,CAR1_Idle}car1_speed;
 
 static enum {FSM_1_IDLE,FSM_1_FORWARD,FSM_1_BURST,FSM_1_BACKWARDS,FSM_1_GAMEOVER,FSM_1_BREAKDOWN
              } current_state_car1;
@@ -119,10 +112,10 @@ void fsm_game_init(void) {
     LEDRed_out = LOW;
     
     
-    
-    
 }
+void fsm_vu_init(void){
 
+}
 
 /********************************************************************
  * Function:        void fsm_game(void)
@@ -131,7 +124,9 @@ void fsm_game_init(void) {
  * Output:          None
  * Overview:        An implementation for a simple reaction game
  ********************************************************************/
-
+void fsm_vu(void){
+    
+}
 void fsm_game(void) {
     
     switch (current_state_game) {                
@@ -265,7 +260,8 @@ void fsm_game(void) {
     {
         
         case FSM_1_IDLE:
-            
+            DC1Bw_out = LOW;
+            DC1Fw_out = LOW;
             BDLED1_out = LOW;
             
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED)) 
@@ -282,8 +278,8 @@ void fsm_game(void) {
             break;
         case FSM_1_FORWARD:
            
+           DC1Fw_out = 0.5f*DCout; 
            
-            
           
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
@@ -500,40 +496,5 @@ void fsm_game(void) {
       
       //vu2
     */
-      
-      ///dc motors
-    
-    switch(car1_speed){
-        case CAR1_Idle:
-            DC1_OUT = 0;
-            break;
-        case CAR1_Drive:
-            if(dc1ON == TRUE && dcCounter1>dcONTime){
-                DC1_OUT = 0;
-                dc1ON = FALSE;
-                dcCounter1 = 0;
-            }
-            else if(dc1ON == FALSE && dcCounter1>dcOFFTime){
-                DC1_OUT = 1;
-                dc1ON = TRUE;
-                dcCounter1 = 0;
-            }
-            break;
-        case CAR1_Full_Beans:
-            if(dc1ON == TRUE && dcCounter1>(dcONTime*4)){
-                DC1_OUT = 0;
-                dc1ON = FALSE;
-                dcCounter1 = 0;
-            }
-            else if(dc1ON == FALSE && dcCounter1>dcOFFTime){
-                DC1_OUT = 1;
-                dc1ON = TRUE;
-                dcCounter1 = 0;
-            }
-            break;
-    }
-    
-    dcCounter1 ++;
-    dcCounter2 ++;
       
 }
