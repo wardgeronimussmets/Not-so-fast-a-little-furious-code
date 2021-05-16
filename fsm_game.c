@@ -133,7 +133,7 @@ void fsm_game(void) {
             AUDIO_stop();
             LEDGr_out = LOW;
             LEDRed_out = LOW;
-            if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED)
+            if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED || PRG_BUTTON == 0)
             {
                 current_state_game = FSM_GAME_INITIALISE;
                 counter = 0;
@@ -151,48 +151,50 @@ void fsm_game(void) {
             }
 
             //increase by 1 hz every 0.25 secs until 25hz. (for 4.5 secs)
-            if (counter7Hz1 > 1999 && X < 13)
+            if (counter7Hz1 > 1999 && X < 51)
             {
-            X = 0.25 * 2 * increasinghzs; //initial value of increasinghzs is 8hzs
-            Y = 250/X;
-            counter250++;
-            Z = (unsigned int) Y;
-            if (counter7Hz2 % Z == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
-
-            }
-            if (counter250 == 250)
-            { counter7Hz2 = 0;
-                    counter250 = 0;
-                    increasinghzs++;
-            }
+                X = 2 * increasinghzs; //initial value of increasinghzs is 8hzs; 
+                Y = 1000/X; 
+                Z = (unsigned int) Y;
+                counter250++; //this counter decide how frequently we need to change the "Frequency nob" in the machine.
+                if (counter7Hz2 % Z == 0)
+                { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                }
+                
+               
+                if (counter250 == 250)
+                { counter7Hz2 = 0;
+                  counter250 = 0;
+                  increasinghzs++;
+                }
             }
         
-            if (X > 13)
+            if (X > 51)
             { permission = TRUE;
             }
            
             //decrease by 1hz every 0.5 secs until to 7hz
-             if (X > 3 && permission)
+             if (X > 13 && permission)
             {
                 X = 0.25 * 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
-            Y = 500/X;
-            Z = (unsigned int) Y;
-            counter500++;
-            if (counter7Hz2 % Z == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                 Y = 500/X;
+                Z = (unsigned int) Y;
+                counter500++;
+                if (counter7Hz2 % Z == 0)
+                { AUDIO_OUT = (unsigned) !AUDIO_OUT;
 
-            }
-            if (counter500 == 500)
-            { counter7Hz2 = 0;
-                    
+                 }
+            
+                if (counter500 == 500)
+                { counter7Hz2 = 0; 
                     counter500 = 0;
                     decreasinghzs--;
-            }
+                }
             }
             
-             if (decreasinghzs == 7)
-                   { counter7Hz1 = 0; }
+           if (decreasinghzs == 7)
+             { counter7Hz1 = 0; 
+                }
                
             
            
