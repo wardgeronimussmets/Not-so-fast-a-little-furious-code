@@ -43,21 +43,20 @@
 
 
 /*** Servo Configuration *****************/
-#define ENABLE_SERVO TRUE
+//#define ENABLE_SERVO TRUE
 
 /* If you are using a servo specify how many you are using
  * for every servo you need to alter the SERVO_ISR() method in func_servo.c 
  * to update the outputs for the servo's */
-#define SERVO_CHANNELS 2
+//#define SERVO_CHANNELS 2
 
-#define SERVO_2_OUT       LATAbits.LATA7
-#define SERVO_1_OUT       LATBbits.LATB5
+
 
 /* Define all out- and inputs with readable names */
 //microController
 #define PRG_BUTTON      PORTCbits.RC0
 #define LED1_OUT        LATCbits.LATC1
-#define LED2_OUT        LATCbits.LATC2
+//#define LED2_OUT        LATCbits.LATC2
 //controller
 #define MULT_S0         LATBbits.LATB4
 #define MULT_S1         LATBbits.LATB3
@@ -74,6 +73,9 @@
 #define START_LED_RED    LATAbits.LATA1
 #define START_LED_GR     LATAbits.LATA2
 
+//revs
+#define REV2       LATAbits.LATA7
+#define REV1        LATBbits.LATB5
 
 //dc motor
 #define DC1_OUT         LATAbits.LATA5

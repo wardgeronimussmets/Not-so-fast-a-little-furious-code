@@ -69,10 +69,12 @@ void fsm_io(void) {
     //CONTR_BD1 = 1;
     CONTR_BD2 = BDLED2_out;
     //CONTR_BD2 = 1;
-
+    //REV1 = 1;
+    //REV2 = 1;
+    //LED2_OUT
     
-    START_LED_GR = LEDGr_out;
-    START_LED_RED = LEDRed_out;
+    START_LED_GR = 0;//LEDGr_out;
+    START_LED_RED = 0;//LEDRed_out;
     
     ///dc motors
     dcCounter1 ++;
@@ -81,11 +83,20 @@ void fsm_io(void) {
     //switches
     ENDLOOP_StartS2 = END_START_SWITCH2;
     
+    /*if(REV1 == 1 && dcCounter1 > 20){
+        DC1_OUT = 0;
+        REV1 = 0;
+        dcCounter1 = 0;
+        
+    }
+    else if(REV1 == 0 && dcCounter1 > 20){
+        DC1_OUT = 1;
+        REV1 = 1;
+        dcCounter1 = 0;
+    }*/
     
-    if(DC_DIRECTION == dcForwards)
-    {
         
-        
+        /*
         //DC motor 1
         if(DC1Fw_out > LOW)
         {
@@ -187,7 +198,27 @@ void fsm_io(void) {
             }
         }
     }
-   
+   */
+    
+    /*if(REV1 == 1 && dcCounter1 > 20){
+        DC1_OUT = 0;
+        REV1 = 0;
+        dcCounter1 = 0;
+        
+    }
+    else if(REV1 == 0 && dcCounter1 > 20){
+        DC1_OUT = 1;
+        REV1 = 1;
+        dcCounter1 = 0;
+    }*/
+    if(PRG_BUTTON == 0 ){
+        DC1_OUT =1;
+        //DC2_OUT = 1;
+    }
+    else{
+        DC1_OUT = 0;
+       // DC2_OUT = 0;
+    }
     
     
     ///Multiplexing

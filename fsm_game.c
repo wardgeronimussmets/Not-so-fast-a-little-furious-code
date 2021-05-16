@@ -110,7 +110,7 @@ void fsm_game_init(void) {
     LEDGr_out = LOW;
     LEDRed_out = LOW;
     
-    SERVO_setPosition(1,0);
+    
 }
 void fsm_vu_init(void){
 
