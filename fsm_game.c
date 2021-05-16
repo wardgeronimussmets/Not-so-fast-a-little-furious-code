@@ -67,8 +67,9 @@ static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
 static unsigned char car2HasBD = FALSE;
 
-static unsigned char burst1Time = 0;
-static unsigned char burst2Time = 0;
+static unsigned int burst1Time = 0;
+static unsigned int burst2Time = 0;
+static unsigned int burstCounter1 = 0;
 static unsigned int vuCounter1 = 0;
 static unsigned int vuCounter2 = 0;
 static unsigned int vuCounter1Limit = 0;
@@ -78,7 +79,7 @@ static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
 
-static unsigned char boostCounter1 = 0;
+static unsigned int boostCounter1 = 0;
 
 static unsigned char DC1ON = 0;
 static unsigned int dcCounter1 = 0;
@@ -289,9 +290,6 @@ void fsm_game(void) {
     {
         
         case FSM_1_IDLE:
-//            DC1Bw_out = LOW;
-//            DC1Fw_out = LOW;
-//            scar1 = SCAR1_IDLE;
             DC1_OUT = 0;
             BDLED1_out = LOW;
             
@@ -299,7 +297,7 @@ void fsm_game(void) {
             {
                 
                 current_state_car1 = FSM_1_BURST;
-                burst1Time = 100000;
+                burst1Time = 2500;
                 gear1 = 1;
             }
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED))
@@ -362,13 +360,13 @@ void fsm_game(void) {
 //            scar1 = SCAR1_DRIVE;
 //            DC1Fw_out = DCout;
             DC1_OUT = 1;
-            counter1 ++;
+            burstCounter1 = burstCounter1 +30;
             LEDRed_out = HIGH;
-            if(counter1>burst1Time)
+            if(burstCounter1>burst1Time)
             {
                 current_state_car1 = FSM_1_FORWARD;
                 LEDRed_out = LOW;
-                counter1 = 0;
+                burstCounter1 = 0;
             }
             
             break;
