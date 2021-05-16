@@ -497,13 +497,6 @@ void fsm_game(void) {
       //vu2
     */
       
-     if(ENDLOOP_StartS1 == 1){
-         DC1_OUT = 1;
-         DC2_OUT = 1;
-        }
-          else{
-         DC1_OUT = 0;
-         DC2_OUT = 0;
-          }
+    
           
       }
