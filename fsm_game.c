@@ -24,7 +24,7 @@
 
 #define DCout 1
 
-#define RedLDWait 1000  // we want 10 sec for the little show to happen in the beggining
+#define RedLDWait 13000  // we want 10 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
 #define BURSTWaitTime 20
 #define BURSTWaitTimeOFF 100
@@ -140,8 +140,6 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-           // considering the fact that the case will be coming 10^3 every second.
-            
             // considering the fact that the case will be coming 10^3 every second.
             // 7HZ for 2sec. 
             counter7Hz1++; 
@@ -152,54 +150,60 @@ void fsm_game(void) {
             counter7Hz2 = 0;
             }
 
-            //increase by 1 hz every 0.25 secs until 25hz. 
-            if (counter7Hz1 > 1999 && X < 13)
+            //increase by 1 hz every 0.25 secs until 25hz. (for 4.5 secs)
+            if (counter7Hz1 > 1999 && X < 51)
             {
-            X = 0.25 * 2 * increasinghzs; //initial value of increasinghzs is 8hzs
-            Y = 250/X;
-            Z = (unsigned int) Y;
-            counter250++;
-            if (counter7Hz2 % Z == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
-
+                X = 2 * increasinghzs; //initial value of increasinghzs is 8hzs; 
+                Y = 1000/X; 
+                Z = (unsigned int) Y;
+                counter250++; //this counter decide how frequently we need to change the "Frequency nob" in the machine.
+                if (counter7Hz2 % Z == 0)
+                { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                }
+                
+               
+                if (counter250 == 250)
+                { counter7Hz2 = 0;
+                  counter250 = 0;
+                  increasinghzs++;
+                }
             }
-            if (counter250 == 250)
-            { counter7Hz2 = 0;
-                    counter250 = 0;
-                    increasinghzs++;
-            }
-            }
-            //decrease by 1hz every 0.5 secs until to 7hz
-            if (X > 13)
+        
+            if (X > 51)
             { permission = TRUE;
             }
-             if (X > 3 && permission)
+           
+            //decrease by 1hz every 0.2 secs until to 7hz
+             if (X > 13 && permission)
             {
-                X = 0.25 * 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
-            Y = 500/X;
-             Z = (unsigned int) Y;
-            counter500++;
-            if (counter7Hz2 % Z == 0)
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                    X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
+                    Y = 1000/X;
+                    Z = (unsigned int) Y;
+                    counter500++;
+                    if (counter7Hz2 % Z == 0)
+                    { AUDIO_OUT = (unsigned) !AUDIO_OUT;
 
+                    }
+            
+                    if (counter500 == 200) // because we want to decrease every 0.2 seconds
+                    { counter7Hz2 = 0; 
+                        counter500 = 0;
+                        decreasinghzs--;
+                    }
             }
-            if (counter500 == 500)
-            { counter7Hz2 = 0;
-                    counter250 = 0;
-                    counter500 = 0;
-                    decreasinghzs--;
-            }
-            }
-            if(decreasinghzs == 7)
-            { counter7Hz1 = 0;
-           }
+            
+           if (decreasinghzs == 7)
+             { counter7Hz1 = 0; 
+                }
+               
+            
+           
             LEDRed_out = HIGH;
             
             counter ++;
             if(counter > RedLDWait)
             {
                 current_state_game = FSM_GAME_GO;
-                AUDIO_OUT = 0 ; 
                 counter = 0;
             }
             break;
@@ -482,14 +486,51 @@ void fsm_game(void) {
       
       //vu2
     */
-     
-     if(ENDLOOP_StartS1 == 1){
-         DC1_OUT = 1;
-         DC2_OUT = 1;
-     }
-     else{
-         DC1_OUT = 0;
-         DC2_OUT = 0;
-     }
+      
+     //servo test
+     /* 
+      if(servoCounter1 > 500){
+        servoCounter1 = 0;  
+        if(LED1_OUT == 1)
+            LED1_OUT = 0;
+        else
+            LED1_OUT = 1;
+        unsigned char servPos = SERVO_getPosition(1);
+        if(servPos>24){
+           servo1DirectionRight = FALSE;
+           LED2_OUT = 1;
+        }
+         if(servPos<1)
+            servo1DirectionRight = TRUE;
+        if(servo1DirectionRight)
+                SERVO_setPosition(1,servPos +1);
+        else
+            SERVO_setPosition(1,servPos +1);
+      }
+      
+      
+      servoCounter1++;
+       */
+      
+      if(PRG_BUTTON == PUSHED && wasPRGBUTTON == RELEASED){
+          //servPos = SERVO_getPosition(1);
+          //SERVO_setPosition(1,servPos +1);
+          
+          
+          
+          if(LED1_OUT == 1){
+            LED1_OUT = 0;
+            SERVO_setPosition(1,20);
+            SERVO_setPosition(2,20);
+          }
+          else{
+            LED1_OUT = 1;
+            SERVO_setPosition(1,0);
+            SERVO_setPosition(2,0);
+          }
+          
+      }
+      //else SERVO_1_OUT = LOW;
+      wasPRGBUTTON =  PRG_BUTTON;
           
 }
