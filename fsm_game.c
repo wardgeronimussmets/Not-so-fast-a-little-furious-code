@@ -24,7 +24,7 @@
 
 #define DCout 1
 
-#define RedLDWait 13000  // we want 10 sec for the little show to happen in the beggining
+#define RedLDWait 1000  // we want 13 sec for the little show to happen in the beggining
 #define GreenLDWait 20000 
 #define BURSTWaitTime 20
 #define BURSTWaitTimeOFF 100
@@ -33,6 +33,9 @@
 #define VUTargetCounter 1000
 #define maxBurst 500
 #define GameEndWaitTime 5000
+
+#define dcONTime 5
+#define dcOFFTime 80
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 static unsigned char greenLDWasOn = TRUE;
@@ -75,7 +78,11 @@ static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
 
+static unsigned char DC1ON = 0;
+static unsigned int dcCounter1 = 0;
+
 static unsigned char wasPRGBUTTON = 0;
+static enum {SCAR1_BURST,SCAR1_DRIVE,SCAR1_IDLE} scar1;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
@@ -111,7 +118,7 @@ void fsm_game_init(void) {
     LEDGr_out = LOW;
     LEDRed_out = LOW;
     
-    
+    scar1 = SCAR1_IDLE;
 }
 void fsm_vu_init(void){
 
@@ -128,10 +135,30 @@ void fsm_vu(void){
     
 }
 void fsm_game(void) {
+    switch(scar1){
+        case SCAR1_IDLE:
+            DC1_OUT = 0;
+            break;
+        case SCAR1_DRIVE:
+            dcCounter1 ++;
+            if(DC1ON == 1 && dcCounter1 > dcONTime){
+                DC1_OUT = 0;
+                DC1ON = 0;
+                dcCounter1 = 0;
+            }
+            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
+                DC1_OUT = 1;
+                DC1ON = 1;
+                dcCounter1 = 0;
+            }
+            
+                
+            break;
+    }
     
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
-        
+            
             LEDGr_out = LOW;
             LEDRed_out = LOW;
             if(CONT1_CLUTCH == PUSHED || CONT2_CLUTCH == PUSHED || PRG_BUTTON == 0)
@@ -262,6 +289,7 @@ void fsm_game(void) {
         case FSM_1_IDLE:
             DC1Bw_out = LOW;
             DC1Fw_out = LOW;
+            scar1 = SCAR1_IDLE;
             BDLED1_out = LOW;
             
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED)) 
@@ -279,6 +307,7 @@ void fsm_game(void) {
         case FSM_1_FORWARD:
            
            DC1Fw_out = 0.5f*DCout; 
+           scar1 = SCAR1_DRIVE;
            
           
            //check if a car has finished
