@@ -173,11 +173,11 @@ void fsm_game(void) {
             { permission = TRUE;
             }
            
-            //decrease by 1hz every 0.5 secs until to 7hz
+            //decrease by 1hz every 0.2 secs until to 7hz
              if (X > 13 && permission)
             {
-                X = 0.25 * 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
-                 Y = 500/X;
+                X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
+                 Y = 1000/X;
                 Z = (unsigned int) Y;
                 counter500++;
                 if (counter7Hz2 % Z == 0)
@@ -185,7 +185,7 @@ void fsm_game(void) {
 
                  }
             
-                if (counter500 == 500)
+                if (counter500 == 200) // because we want to decrease every 0.2 seconds
                 { counter7Hz2 = 0; 
                     counter500 = 0;
                     decreasinghzs--;
