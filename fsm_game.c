@@ -160,12 +160,12 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-            /*************************CUSTOM STARTING AUDIO*****************************************/
-            // 9HZ for 2sec. 
+            // considering the fact that the case will be coming 10^3 every second.
+            // 7HZ for 2sec. 
             counter7Hz1++; 
             counter7Hz2++;
 
-            if (counter7Hz1 % 55 == 0 && counter7Hz1 < 2000) //Note: 55.5 * 18 = 1000. We use 14 because we need on and off.
+            if (counter7Hz1 % 71 == 0 && counter7Hz1 < 2000) //Note: 71.5 * 14 = 1000. We use 14 because we need on and off.
             { AUDIO_OUT = (unsigned) !AUDIO_OUT;
                 AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
             counter7Hz2 = 0;
@@ -174,7 +174,7 @@ void fsm_game(void) {
             //increase by 1 hz every 0.25 secs until 25hz. (for 4.5 secs)
             if (counter7Hz1 > 1999 && X < 51)
             {
-                X = 2 * increasinghzs; //initial value of increasinghzs is 10hzs; 
+                X = 2 * increasinghzs; //initial value of increasinghzs is 8hzs; 
                 Y = 1000/X; 
                 Z = (unsigned int) Y;
                 counter250++; //this counter decide how frequently we need to change the "Frequency nob" in the machine.
@@ -197,7 +197,7 @@ void fsm_game(void) {
             }
            
             //decrease by 1hz every 0.2 secs until to 7hz
-             if (X > 19 && permission)
+             if (X > 13 && permission)
             {
                     X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
                     Y = 1000/X;
@@ -218,11 +218,10 @@ void fsm_game(void) {
             
            if (decreasinghzs == 7)  
             { counter7Hz1 = 0; 
-                decreasinghzs = 25;
-                X = 0; 
            }
             
-         /*******************************CUSTOM AUDIO FINISHES***********************************/    
+            
+           
             LEDRed_out = HIGH;
             
             counter ++;
@@ -233,11 +232,7 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_GO:
-            countergreen++;
-            if (countergreen % 55 == 0) // keep on playing at 9HZs
-            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
-                 AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
-            }
+            AUDIO_play(D2);
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
