@@ -394,6 +394,7 @@ void fsm_game(void) {
             break;
     }
     //rev1
+   
     revCounter1 = revCounter1 + 5;
     revBigCounterReducer1 ++;
     revBigCounter1 ++;
@@ -456,7 +457,7 @@ void fsm_game(void) {
            
            
             //check if car has shifted a gear          
-            newGear1 = 0;
+            newGear2 = 0;
             if(CONT2_GEAR1 ==  PUSHED) newGear2 =  1;
             if(CONT2_GEAR2 ==  PUSHED) newGear2 =  2;
             if(CONT2_GEAR3 ==  PUSHED) newGear2 =  3;
@@ -566,8 +567,11 @@ void fsm_game(void) {
         REV2 = 1;
     }
    
-     
+    if(CONT2_GEAR6 == PUSHED){
+        REV2 = 1;
+    }
       
+    
     
           
       }

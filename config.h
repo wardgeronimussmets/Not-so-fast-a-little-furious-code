@@ -68,14 +68,14 @@
 
 
 //breakdown leds
-#define CONTR_BD2       LATAbits.LATA6
+#define CONTR_BD2       LATAbits.LATA7
 #define CONTR_BD1       LATBbits.LATB6
 //starting leds
 #define START_LED_RED    LATAbits.LATA1
 #define START_LED_GR     LATAbits.LATA2
 
 //revs
-#define REV2       LATAbits.LATA7
+#define REV2       LATAbits.LATA6
 #define REV1        LATBbits.LATB5
 
 //dc motor
