@@ -24,15 +24,18 @@
 
 #define DCout 1
 
-#define RedLDWait 13000  // we want 10 sec for the little show to happen in the beggining
-#define GreenLDWait 20000 
+#define RedLDWait 8500  // we want 10 sec for the little show to happen in the beggining
+#define GreenLDWait 2000 
 #define BURSTWaitTime 20
-#define BURSTWaitTimeOFF 100
+#define BURSTWaitTimeOFF 20
 #define VUWaitTime 1
 #define VUWaitTimeOFF 40
 #define VUTargetCounter 1000
 #define maxBurst 500
 #define GameEndWaitTime 5000
+
+#define dcONTime 5
+#define dcOFFTime 80
 
 /** P R I V A T E   V A R I A B L E S *******************************/
 static unsigned char greenLDWasOn = TRUE;
@@ -49,13 +52,19 @@ static unsigned int counter2 = 0;
 
 static unsigned int counter7Hz1 = 0;
 static unsigned int counter7Hz2 = 0;
-static unsigned int increasinghzs = 8;
+static unsigned int counterforward = 0;
+static unsigned int countergreen = 0;
+static unsigned int increasinghzs = 9;
+static unsigned int counter250 = 0;
+static unsigned int counter500 = 0;
+static unsigned int breakdowncounter = 0;
+static unsigned int decreasinghzs = 25;
 static unsigned int X = 0;
 static unsigned int Y = 0;
 static unsigned int Z = 0;
-static unsigned int counter250 = 0;
-static unsigned int counter500 = 0;
-static unsigned int decreasinghzs = 25;
+static unsigned int XF = 0;
+static unsigned int YF = 0;
+static unsigned int ZF = 0;
 
 static unsigned char permission = FALSE;
 
@@ -63,8 +72,10 @@ static unsigned char gameWasWon = FALSE;
 static unsigned char car1HasBD = FALSE;
 static unsigned char car2HasBD = FALSE;
 
-static unsigned char burst1Time = 0;
-static unsigned char burst2Time = 0;
+static unsigned int burst1Time = 0;
+static unsigned int burst2Time = 0;
+static unsigned int burstCounter1 = 0;
+static unsigned int burstCounter2 = 0;
 static unsigned int vuCounter1 = 0;
 static unsigned int vuCounter2 = 0;
 static unsigned int vuCounter1Limit = 0;
@@ -74,7 +85,22 @@ static unsigned int servoCounter2 = 0;
 static unsigned char servo1DirectionRight = TRUE;
 static unsigned char servPos = 0;
 
+static unsigned int boostCounter1 = 0;
+static unsigned int revBigCounter1 = 0;
+static unsigned int revBigCounterReducer1 = 0;
+static unsigned int boostCounter2 = 0;
+static unsigned int revBigCounter2 = 0;
+static unsigned int revBigCounterReducer2 = 0;
+
+static unsigned char DC1ON = 0;
+static unsigned int dcCounter1 = 0;
+static unsigned int revCounter1 = 0;
+static unsigned char DC2ON = 0;
+static unsigned int dcCounter2 = 0;
+static unsigned int revCounter2 = 0;
+
 static unsigned char wasPRGBUTTON = 0;
+static enum {SCAR1_BURST,SCAR1_DRIVE,SCAR1_IDLE} scar1;
 
 static enum{FSM_GAME_IDLE,FSM_GAME_INITIALISE,FSM_GAME_GO,FSM_GAME_WAIT,FSM_GAME_GAMEOVER}current_state_game;
 
@@ -110,7 +136,7 @@ void fsm_game_init(void) {
     LEDGr_out = LOW;
     LEDRed_out = LOW;
     
-    
+    scar1 = SCAR1_IDLE;
 }
 void fsm_vu_init(void){
 
@@ -140,25 +166,29 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_INITIALISE:
-            // considering the fact that the case will be coming 10^3 every second.
-            // 7HZ for 2sec. 
-            counter7Hz1++; 
+            /*************************CUSTOM STARTING AUDIO*****************************************/
+            // 9HZ for 2sec. 
+            
+            
+           counter7Hz1++; 
             counter7Hz2++;
 
-            if (counter7Hz1 % 71 == 0 && counter7Hz1 < 2000) //Note: 71.5 * 14 = 1000. We use 14 because we need on and off.
+            if (counter7Hz1 % 55 == 0 && counter7Hz1 < 2000) //Note: 55.5 * 18 = 1000. We use 14 because we need on and off.
             { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
             counter7Hz2 = 0;
             }
 
             //increase by 1 hz every 0.25 secs until 25hz. (for 4.5 secs)
             if (counter7Hz1 > 1999 && X < 51)
             {
-                X = 2 * increasinghzs; //initial value of increasinghzs is 8hzs; 
+                X = 2 * increasinghzs; //initial value of increasinghzs is 9hzs; 
                 Y = 1000/X; 
                 Z = (unsigned int) Y;
                 counter250++; //this counter decide how frequently we need to change the "Frequency nob" in the machine.
                 if (counter7Hz2 % Z == 0)
                 { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                    AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
                 }
                 
                
@@ -171,33 +201,39 @@ void fsm_game(void) {
         
             if (X > 51)
             { permission = TRUE;
+                increasinghzs = 10;
             }
            
-            //decrease by 1hz every 0.2 secs until to 7hz
-             if (X > 13 && permission)
+            //decrease by 1hz every 0.05 secs until to 7hz TOTALLING 0.9 SECS
+             if (X > 17 && permission)
             {
                     X = 2 * decreasinghzs; //initial value of the decreasing hzs is 25hzs
                     Y = 1000/X;
                     Z = (unsigned int) Y;
                     counter500++;
                     if (counter7Hz2 % Z == 0)
-                    { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                    {   AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                        AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
 
                     }
             
-                    if (counter500 == 200) // because we want to decrease every 0.2 seconds
+                    if (counter500 == 75) // because we want to decrease every 0.2 seconds
                     { counter7Hz2 = 0; 
                         counter500 = 0;
                         decreasinghzs--;
                     }
             }
             
-           if (decreasinghzs == 7)
+           if (decreasinghzs == 8)
              { counter7Hz1 = 0; 
+                decreasinghzs = 25;
+                X = 0; 
+                permission = FALSE;
                 }
                
+         /*******************************CUSTOM AUDIO FINISHES***********************************/    
             
-           
+            
             LEDRed_out = HIGH;
             
             counter ++;
@@ -208,7 +244,11 @@ void fsm_game(void) {
             }
             break;
         case FSM_GAME_GO:
-            AUDIO_play(D2);
+            countergreen++;
+            if (countergreen % 55 == 0) // keep on playing at 9HZs
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                 AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
+            }
             LEDRed_out = LOW;
             LEDGr_out = HIGH;
             greenLDWasOn = FALSE;
@@ -250,14 +290,14 @@ void fsm_game(void) {
     {
         
         case FSM_1_IDLE:
-            DC1Bw_out = LOW;
-            DC1Fw_out = LOW;
+            DC1_OUT = 0;
             BDLED1_out = LOW;
             
             if((GAME_STARTED==TRUE) && (CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED)) 
             {
                 
-                current_state_car1 = FSM_1_FORWARD;
+                current_state_car1 = FSM_1_BURST;
+                burst1Time = 2500;
                 gear1 = 1;
             }
             else if((GAME_STARTED == FALSE)&&(CONT1_GEAR1 == PUSHED) && (CONT1_CLUTCH == RELEASED))
@@ -268,9 +308,53 @@ void fsm_game(void) {
             break;
         case FSM_1_FORWARD:
            
-           DC1Fw_out = 0.5f*DCout; 
+//           DC1Fw_out = 0.5f*DCout; 
+//           scar1 = SCAR1_IDLE;
+            counterforward++;
            
-          
+            switch (gear1)
+            {   
+                case 1:
+                    increasinghzs = 9;
+                    break;
+                
+                
+                case 2:
+                    increasinghzs = 12;
+                    break;
+                
+                case 3:
+                    increasinghzs = 14;
+                    break;
+                
+                case 4:
+                    increasinghzs = 16;
+                    break;
+                    
+                case 5:
+                    increasinghzs = 18;
+                    break;
+                    
+                case 6:
+                    increasinghzs = 20;
+                    break;
+            }
+            
+            
+            XF = 2 * increasinghzs;  
+            YF = 1000/XF; 
+            ZF = (unsigned int) YF;
+               
+            if (counterforward % ZF == 0)
+            { AUDIO_OUT = (unsigned) !AUDIO_OUT;
+                AUDIO_OUT2 = (unsigned) !AUDIO_OUT2;
+              }
+            
+            DC1_OUT = 0;
+            boostCounter1 ++;
+            if(boostCounter1 > 5000){
+                current_state_car1 = FSM_1_BREAKDOWN;
+            }
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
                current_state_car1 = FSM_1_GAMEOVER;
@@ -291,6 +375,7 @@ void fsm_game(void) {
         {
             //no gear change
             
+            
         }
         else
         {
@@ -298,15 +383,13 @@ void fsm_game(void) {
             if(newGear1 - gear1 == 1  && clutch1Was == PUSHED)
             {
                 //correct shift
-                vuCounter1Limit = 0;
-                counter1 = 0;
-                //determine length of burst
-                if(VUTargetCounter-vuCounter1Limit>0)
-                    burst1Time = maxBurst - (VUTargetCounter-vuCounter1Limit);
-                else
-                    burst1Time = maxBurst + (VUTargetCounter-vuCounter1Limit);
+                revBigCounter1 = 0;
+                burst1Time = boostCounter1;
+                boostCounter1 = 0;
                 current_state_car1 = FSM_1_BURST;
                 gear1 = newGear1;
+                counterforward = 0;
+                
             }
             else
             {
@@ -316,21 +399,38 @@ void fsm_game(void) {
         }
         
            clutch1Was = CONT1_CLUTCH; 
+           
+           
+          
     
         break;
         case FSM_1_BURST:
-            DC1Fw_out = DCout;
-            counter1 ++;
+//            scar1 = SCAR1_DRIVE;
+//            DC1Fw_out = DCout;
+            DC1_OUT = 1;
+            burstCounter1 = burstCounter1 +30;
             LEDRed_out = HIGH;
-            if(counter1>BURSTWaitTime+burst1Time)
+            if(burstCounter1>burst1Time)
             {
                 current_state_car1 = FSM_1_FORWARD;
                 LEDRed_out = LOW;
+                burstCounter1 = 0;
             }
             
             break;
         case FSM_1_BREAKDOWN:
+            breakdowncounter++;
+            if (breakdowncounter < 2500)
+            { AUDIO_play(F2);
+            
+            }
+            if (breakdowncounter > 2500)
+            { AUDIO_stop();
+            
+            }
+            
             DC1Fw_out = LOW;
+            DC1_OUT = 0;
             CAR1_BREAKDOWN = TRUE;
             car1HasBD = TRUE;
             BDLED1_out = HIGH;
@@ -359,28 +459,64 @@ void fsm_game(void) {
             current_state_car1 = FSM_1_IDLE;
             break;
     }
+    //rev1
+   
+    revCounter1 = revCounter1 + 5;
+    revBigCounterReducer1 ++;
+    revBigCounter1 ++;
+    if(revBigCounterReducer1 > 2){
+        revBigCounter1 --;
+        revBigCounterReducer1 = 0;
+    }
+    //if boostCounter biggger than 4000 then it should decrease again
+    if(current_state_car1 == FSM_1_FORWARD){
+        if(REV1 == 1 && revCounter1 > revBigCounter1){
+            REV1 = 0;
+            revCounter1 = 0;
+        }
+        else if(REV1 == 0 && revCounter1 > 80){
+            REV1 = 1;
+            revCounter1 = 0;
+        }
+    }
+    else{
+        revBigCounter1 = 0;
+        revCounter1 = 0;
+    }
+    if(revBigCounter1 > 2000){
+        REV1 = 1;
+    }
     /*******************************************************************************************************************************************/
     
       switch(current_state_car2)
     {
+        
         case FSM_2_IDLE:
-            DC2Bw_out = LOW;
-            DC2Fw_out = LOW;
-            //BDLED2_out = LOW;
-            if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED)) 
+            DC2_OUT = 0;
+            BDLED2_out = LOW;
+            
+            if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED) && (CONT2_CLUTCH == RELEASED)) 
             {
-                current_state_car2 = FSM_2_FORWARD;
+                
+                current_state_car2 = FSM_2_BURST;
+                burst2Time = 2500;
                 gear2 = 1;
             }
-            else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED))
+            else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED) && (CONT2_CLUTCH == RELEASED))
             {
                 //false start
-                //current_state_car2 = FSM_2_BREAKDOWN;
+                current_state_car2 = FSM_2_BREAKDOWN;
             }
             break;
         case FSM_2_FORWARD:
             
-           DC2Fw_out = 0.5*DCout;  
+//           DC1Fw_out = 0.5f*DCout; 
+//           scar1 = SCAR1_IDLE;
+            DC2_OUT = 0;
+            boostCounter2 ++;
+            if(boostCounter2 > 5000){
+                current_state_car2 = FSM_2_BREAKDOWN;
+            }
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
                current_state_car2 = FSM_2_GAMEOVER;
@@ -395,18 +531,23 @@ void fsm_game(void) {
             if(CONT2_GEAR5 ==  PUSHED) newGear2 =  5;
             if(CONT2_GEAR6 ==  PUSHED) newGear2 =  6;
             
-        if(newGear2 == gear2)
+            
+            
+        if(newGear2 == gear2 || newGear2 == 0 ||CONT2_CLUTCH == PUSHED )
         {
             //no gear change
+            
             
         }
         else
         {
             //gear1 has been changed
-            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED )
+            if(newGear2 - gear2 == 1  && clutch2Was == PUSHED)
             {
                 //correct shift
-                counter2 = 0;
+                revBigCounter2 = 0;
+                burst2Time = boostCounter2;
+                boostCounter2 = 0;
                 current_state_car2 = FSM_2_BURST;
                 gear2 = newGear2;
             }
@@ -417,24 +558,32 @@ void fsm_game(void) {
             }
         }
             
+           clutch2Was = CONT2_CLUTCH; 
             
-    
         break;
         case FSM_2_BURST:
-            DC2Fw_out = DCout;
-            counter2 ++;
-            if(counter2>BURSTWaitTime+burst2Time)
+//            scar1 = SCAR1_DRIVE;
+//            DC1Fw_out = DCout;
+            DC2_OUT = 1;
+            burstCounter2 = burstCounter2 +30;
+            LEDRed_out = HIGH;
+            if(burstCounter2>burst2Time)
             {
                 current_state_car2 = FSM_2_FORWARD;
+                LEDRed_out = LOW;
+                burstCounter2 = 0;
             }
             
             break;
         case FSM_2_BREAKDOWN:
             DC2Fw_out = LOW;
+            DC2_OUT = 0;
             CAR2_BREAKDOWN = TRUE;
             car2HasBD = TRUE;
             BDLED2_out = HIGH;
+            
             break;
+            
         case FSM_2_GAMEOVER:
             //a car has finished
             gameWasWon = TRUE;
@@ -444,6 +593,7 @@ void fsm_game(void) {
                 current_state_car2 = FSM_2_BACKWARDS;
             }
             break;
+            
         case FSM_2_BACKWARDS:
             DC2Fw_out = LOW;
             DC2Bw_out = DCout;
@@ -456,44 +606,26 @@ void fsm_game(void) {
             current_state_car2 = FSM_2_IDLE;
             break;
     } 
+    //rev1
+    revCounter2 = revCounter2 + 5;
+    revBigCounterReducer2 ++;
+    revBigCounter2 ++;
+    if(revBigCounterReducer2 > 2){
+        revBigCounter2 --;
+        revBigCounterReducer2 = 0;
+            }
+    //if boostCounter biggger than 4000 then it should decrease again
+    if(current_state_car2 == FSM_2_FORWARD){
+        if(REV2 == 1 && revCounter2 > revBigCounter2){
+            REV2 = 0;
+            revCounter2 = 0;
+        }
+        else if(REV2 == 0 && revCounter2 > 80){
+            REV2 = 1;
+            revCounter2 = 0;
+            }
+        }
+    }
     
-      /*******************Difficulty with vu************************************/
-    /*//vu1
-    if(current_state_car1 == FSM_1_FORWARD || current_state_car1 == FSM_1_BURST){
-        if(SERVO_1_OUT == HIGH){
-            if(vuCounter1 > VUWaitTime + vuCounter1Limit){
-                SERVO_1_OUT = LOW;
-                vuCounter1Limit++;
-            }
-        }
-        else{
-            if(vuCounter1 > VUWaitTimeOFF){
-                SERVO_1_OUT = HIGH;
-                vuCounter1Limit ++;
-            }
-        }
-    }
-    else{
-        SERVO_1_OUT = LOW;
-    }
-     
-      if(CONT1_CLUTCH == PUSHED) vuCounter1Limit = 0;
-      
-      vuCounter1++;
-      SERVO_1_OUT = HIGH;
-      
-      
-      
-      //vu2
-    */
-      
-     if(ENDLOOP_StartS1 == 1){
-         DC1_OUT = 1;
-         DC2_OUT = 1;
-        }
-          else{
-         DC1_OUT = 0;
-         DC2_OUT = 0;
-          }
           
-      }
+      
