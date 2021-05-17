@@ -70,6 +70,7 @@ static unsigned char car2HasBD = FALSE;
 static unsigned int burst1Time = 0;
 static unsigned int burst2Time = 0;
 static unsigned int burstCounter1 = 0;
+static unsigned int burstCounter2 = 0;
 static unsigned int vuCounter1 = 0;
 static unsigned int vuCounter2 = 0;
 static unsigned int vuCounter1Limit = 0;
@@ -82,10 +83,16 @@ static unsigned char servPos = 0;
 static unsigned int boostCounter1 = 0;
 static unsigned int revBigCounter1 = 0;
 static unsigned int revBigCounterReducer1 = 0;
+static unsigned int boostCounter2 = 0;
+static unsigned int revBigCounter2 = 0;
+static unsigned int revBigCounterReducer2 = 0;
 
 static unsigned char DC1ON = 0;
 static unsigned int dcCounter1 = 0;
 static unsigned int revCounter1 = 0;
+static unsigned char DC2ON = 0;
+static unsigned int dcCounter2 = 0;
+static unsigned int revCounter2 = 0;
 
 static unsigned char wasPRGBUTTON = 0;
 static enum {SCAR1_BURST,SCAR1_DRIVE,SCAR1_IDLE} scar1;
@@ -140,28 +147,7 @@ void fsm_vu_init(void){
 void fsm_vu(void){
     
 }
-void fsm_game(void) {
-//    switch(scar1){
-//        case SCAR1_IDLE:
-//            DC1_OUT = 0;
-//            break;
-//        case SCAR1_DRIVE:
-//            dcCounter1 ++;
-//            if(DC1ON == 1 && dcCounter1 > dcONTime){
-//                DC1_OUT = 0;
-//                DC1ON = 0;
-//                dcCounter1 = 0;
-//            }
-//            else if(DC1ON == 0 && dcCounter1 > dcOFFTime){
-//                DC1_OUT = 1;
-//                DC1ON = 1;
-//                dcCounter1 = 0;
-//            }  
-//            
-//            break;
-//        
-//    }
-    
+void fsm_game(void) {    
     switch (current_state_game) {                
         case FSM_GAME_IDLE:          
             
@@ -437,31 +423,40 @@ void fsm_game(void) {
     
       switch(current_state_car2)
     {
+        
         case FSM_2_IDLE:
-            DC2Bw_out = LOW;
-            DC2Fw_out = LOW;
-            //BDLED2_out = LOW;
-            if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED)) 
+            DC2_OUT = 0;
+            BDLED2_out = LOW;
+            
+            if((GAME_STARTED==TRUE) && (CONT2_GEAR1 == PUSHED) && (CONT2_CLUTCH == RELEASED)) 
             {
-                current_state_car2 = FSM_2_FORWARD;
+                
+                current_state_car2 = FSM_2_BURST;
+                burst2Time = 2500;
                 gear2 = 1;
             }
-            else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED))
+            else if((GAME_STARTED == FALSE)&&(CONT2_GEAR1 == PUSHED) && (CONT2_CLUTCH == RELEASED))
             {
                 //false start
-                //current_state_car2 = FSM_2_BREAKDOWN;
+                current_state_car2 = FSM_2_BREAKDOWN;
             }
             break;
         case FSM_2_FORWARD:
-            
-           DC2Fw_out = 0.5*DCout;  
+           
+//           DC1Fw_out = 0.5f*DCout; 
+//           scar1 = SCAR1_IDLE;
+            DC2_OUT = 0;
+            boostCounter2 ++;
+            if(boostCounter2 > 5000){
+                current_state_car2 = FSM_2_BREAKDOWN;
+            }
            //check if a car has finished
            if(ENDLOOP_FinishS == PUSHED)
                current_state_car2 = FSM_2_GAMEOVER;
            
            
             //check if car has shifted a gear          
-            newGear2 = 0;
+            newGear1 = 0;
             if(CONT2_GEAR1 ==  PUSHED) newGear2 =  1;
             if(CONT2_GEAR2 ==  PUSHED) newGear2 =  2;
             if(CONT2_GEAR3 ==  PUSHED) newGear2 =  3;
@@ -469,18 +464,23 @@ void fsm_game(void) {
             if(CONT2_GEAR5 ==  PUSHED) newGear2 =  5;
             if(CONT2_GEAR6 ==  PUSHED) newGear2 =  6;
             
-        if(newGear2 == gear2)
+            
+            
+        if(newGear2 == gear2 || newGear2 == 0 ||CONT2_CLUTCH == PUSHED )
         {
             //no gear change
+            
             
         }
         else
         {
             //gear1 has been changed
-            if(newGear2 - gear2 == 1 && CONT2_CLUTCH == PUSHED)
+            if(newGear2 - gear2 == 1  && clutch2Was == PUSHED)
             {
                 //correct shift
-                counter2 = 0;
+                revBigCounter2 = 0;
+                burst2Time = boostCounter2;
+                boostCounter2 = 0;
                 current_state_car2 = FSM_2_BURST;
                 gear2 = newGear2;
             }
@@ -490,25 +490,33 @@ void fsm_game(void) {
                 current_state_car2 = FSM_2_BREAKDOWN;
             }
         }
-            
-            
+        
+           clutch2Was = CONT2_CLUTCH; 
     
         break;
         case FSM_2_BURST:
-            DC2Fw_out = DCout;
-            counter2 ++;
-            if(counter2>BURSTWaitTime+burst2Time)
+//            scar1 = SCAR1_DRIVE;
+//            DC1Fw_out = DCout;
+            DC2_OUT = 1;
+            burstCounter2 = burstCounter2 +30;
+            LEDRed_out = HIGH;
+            if(burstCounter2>burst2Time)
             {
                 current_state_car2 = FSM_2_FORWARD;
+                LEDRed_out = LOW;
+                burstCounter2 = 0;
             }
             
             break;
         case FSM_2_BREAKDOWN:
             DC2Fw_out = LOW;
+            DC2_OUT = 0;
             CAR2_BREAKDOWN = TRUE;
             car2HasBD = TRUE;
             BDLED2_out = HIGH;
+            
             break;
+            
         case FSM_2_GAMEOVER:
             //a car has finished
             gameWasWon = TRUE;
@@ -518,6 +526,7 @@ void fsm_game(void) {
                 current_state_car2 = FSM_2_BACKWARDS;
             }
             break;
+            
         case FSM_2_BACKWARDS:
             DC2Fw_out = LOW;
             DC2Bw_out = DCout;
@@ -529,37 +538,35 @@ void fsm_game(void) {
         default:
             current_state_car2 = FSM_2_IDLE;
             break;
-    } 
-    
-      /*******************Difficulty with vu************************************/
-    /*//vu1
-    if(current_state_car1 == FSM_1_FORWARD || current_state_car1 == FSM_1_BURST){
-        if(SERVO_1_OUT == HIGH){
-            if(vuCounter1 > VUWaitTime + vuCounter1Limit){
-                SERVO_1_OUT = LOW;
-                vuCounter1Limit++;
-            }
+    }
+    //rev1
+    revCounter2 = revCounter2 + 5;
+    revBigCounterReducer2 ++;
+    revBigCounter2 ++;
+    if(revBigCounterReducer2 > 2){
+        revBigCounter2 --;
+        revBigCounterReducer2 = 0;
+    }
+    //if boostCounter biggger than 4000 then it should decrease again
+    if(current_state_car2 == FSM_2_FORWARD){
+        if(REV2 == 1 && revCounter2 > revBigCounter2){
+            REV2 = 0;
+            revCounter2 = 0;
         }
-        else{
-            if(vuCounter1 > VUWaitTimeOFF){
-                SERVO_1_OUT = HIGH;
-                vuCounter1Limit ++;
-            }
+        else if(REV2 == 0 && revCounter2 > 80){
+            REV2 = 1;
+            revCounter2 = 0;
         }
     }
     else{
-        SERVO_1_OUT = LOW;
+        revBigCounter2 = 0;
+        revCounter2 = 0;
     }
+    if(revBigCounter2 > 2000){
+        REV2 = 1;
+    }
+   
      
-      if(CONT1_CLUTCH == PUSHED) vuCounter1Limit = 0;
-      
-      vuCounter1++;
-      SERVO_1_OUT = HIGH;
-      
-      
-      
-      //vu2
-    */
       
     
           
